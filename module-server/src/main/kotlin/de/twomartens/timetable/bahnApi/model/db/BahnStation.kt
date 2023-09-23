@@ -10,7 +10,7 @@ import java.time.Instant
 
 @Document
 data class BahnStation(
-        var name: String,
+        @Indexed var name: String,
         @Indexed(unique = true) var eva: String,
         var ds100: String,
         var db: Boolean
