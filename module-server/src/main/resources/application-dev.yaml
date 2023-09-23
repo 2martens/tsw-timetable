@@ -1,6 +1,9 @@
-#TODO zufaellige Ports eintragen
-server.port: 12000
-grpc.server.port: 12002
-management.server.port: 12001
+server.port: 12100
+management.server.port: 12101
 
-de.twomartens.template.name: "Template"
+
+spring:
+  config:
+    import:
+      - "classpath:config/timetable.yaml"
+      - "optional:configserver:${CONFIGSERVER_SCHEME:http}://${CONFIGSERVER_HOST:localhost}:${CONFIGSERVER_PORT:8888}${CONFIGSERVER_PREFIX:/config}"

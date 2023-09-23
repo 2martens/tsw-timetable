@@ -1,12 +1,12 @@
 server:
-  port: 8080
+  port: 12100
   shutdown: graceful
-grpc.server.port: 9090
+  forward-headers-strategy: framework
 
 ### technical configurations ###
 management:
   # for security, don't use same port as application
-  server.port: 8081
+  server.port: 12101
   health:
     livenessState.enabled: true
     readinessState.enabled: true
@@ -15,7 +15,7 @@ management:
       show-details: always
       probes.enabled: true
       group:
-        readiness.include: readinessState,diskSpace,grpcChannel,grpc,rest
+        readiness.include: readinessState,diskSpace,rest
         liveness.include: livenessState
   endpoints.web.exposure.include: '*'
   # activate percentiles for web and grpc requests
@@ -24,40 +24,49 @@ management:
     http.server.requests: true
 
 spring:
+  cloud:
+    config:
+      name: timetable
   main:
     banner-mode: off
   profiles:
     default: dev
-
-# properties for application
-de.twomartens.template:
-  defaultTimeZone: Europe/Berlin
-  greeting: "Hello %s"
+  data.mongodb:
+    uri: ${MONGODB_CONNECTION_STRING}
+    auto-index-creation: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KEYCLOAK_URL:https://id.2martens.de}/realms/${KEYCLOAK_REALM:2martens}/protocol/openid-connect/certs
+  application:
+    name: timetable
 
 springdoc:
   swagger-ui:
-    path: '/template/doc/'
-  api-docs:
-    path: '/template/api-docs/'
+    display-request-duration: true
+    operationsSorter: method
+    disable-swagger-default-url: true
+    path: '/timetable/v1/doc/'
   default-produces-media-type: 'application/json'
+  api-docs:
+    path: '/timetable/v1/api-docs'
 
 openapi:
-  #TODO write description/ changelog
   description: |
-    Open API Documentation for the Template
-
-    ## Header 2
-
-    __YOUR TEXT HERE__
-
+    Open API Documentation for the Timetable API
+    
+    TODO
+    
+    
     ## Changelog
 
     |Version | Change                                 | Author | Date       |
     | ------ | -------------------------------------- | ------ | ---------- |
-    | 1.0    | added API Versioning (and changelog)   | Jim    | 28.05.2023 |
+    | 1.0    | added API Versioning (and changelog)   | Jim    | 13.07.2023 |
 
   version: 1.0
-  title: 'Template API'
+  title: 'Timetable API'
 
 resttemplate:
   timeout:
@@ -65,3 +74,11 @@ resttemplate:
     connectionRestHealthIndicatorTimeoutInMillis: 5000
     readTimeoutRestTemplateInMillis: 5000
     connectionRestTemplateTimeoutInMillis: 5000
+
+de.twomartens.timetable:
+  bahn-api:
+    client-id: ${DB_CLIENT_ID}
+    client-secret: ${DB_CLIENT_SECRET}
+
+time:
+  defaultTimeZone: Europe/Berlin

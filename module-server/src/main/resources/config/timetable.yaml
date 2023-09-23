@@ -1,0 +1,7 @@
+de.twomartens.timetable:
+  greeting: "Hello %s, on millenium"
+  statusprobe:
+    scheduleDuration: 60
+    maxKafkaFailureDuration: 5
+    maxBlobFailureCount: 5
+    maxFailurePercent: 50
