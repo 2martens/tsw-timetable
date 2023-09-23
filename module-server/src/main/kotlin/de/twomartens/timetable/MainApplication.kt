@@ -22,7 +22,7 @@ open class MainApplication(
     fun ready() {
         val result = bahnApiService.fetchStations("Köln Hbf")
         val koeln = result[0]
-        val stops = bahnApiService.fetchTimetable(koeln.eva,
+        val timetable = bahnApiService.fetchTimetable(koeln.eva,
                 LocalDate.of(2023, Month.SEPTEMBER, 23),
                 LocalTime.of(17, 0))
         log.info("stations: $result")
