@@ -9,11 +9,11 @@ data class BahnStation(
     @field:XmlAttribute
     var name: String,
     @field:XmlAttribute
-    var eva: String,
+    var eva: Int?,
     @field:XmlAttribute
     var ds100: String,
     @field:XmlAttribute
     var db: Boolean
 ) {
-    constructor(): this("", "", "", true)
+    constructor(): this("", null, "", true)
 }
