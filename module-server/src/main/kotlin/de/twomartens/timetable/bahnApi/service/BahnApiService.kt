@@ -1,7 +1,6 @@
 package de.twomartens.timetable.bahnApi.service
 
 import de.twomartens.timetable.bahnApi.model.dto.BahnStation
-import de.twomartens.timetable.bahnApi.model.dto.BahnStationStop
 import de.twomartens.timetable.bahnApi.model.dto.BahnStations
 import de.twomartens.timetable.bahnApi.model.dto.BahnTimetable
 import de.twomartens.timetable.bahnApi.property.BahnApiProperties
