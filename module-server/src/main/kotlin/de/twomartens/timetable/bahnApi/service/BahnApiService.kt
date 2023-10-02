@@ -31,7 +31,7 @@ class BahnApiService(
         return body?.stations ?: listOf()
     }
 
-    fun fetchTimetable(eva: String, date: LocalDate, hour: LocalTime): BahnTimetable {
+    fun fetchTimetable(eva: Int, date: LocalDate, hour: LocalTime): BahnTimetable {
         val requestEntity = buildRequestEntity<BahnTimetable>()
         val dateFormatter = DateTimeFormatter.ofPattern("yyMMdd")
         val timeFormatter = DateTimeFormatter.ofPattern("HH")

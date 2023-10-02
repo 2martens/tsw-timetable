@@ -1,6 +1,7 @@
 package de.twomartens.timetable
 
 import de.twomartens.timetable.bahnApi.service.BahnApiService
+import de.twomartens.timetable.bahnApi.service.BahnDatabaseService
 import mu.KotlinLogging
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.event.ApplicationReadyEvent
@@ -16,16 +17,15 @@ import java.time.Month
 @EnableScheduling
 @SpringBootApplication
 open class MainApplication(
-        private val bahnApiService: BahnApiService
+        private val bahnApiService: BahnApiService,
+        private val bahnDatabaseService: BahnDatabaseService
 ) {
     @EventListener(ApplicationReadyEvent::class)
     fun ready() {
-        val result = bahnApiService.fetchStations("Köln Hbf")
-        val koeln = result[0]
-        val timetable = bahnApiService.fetchTimetable(koeln.eva,
-                LocalDate.of(2023, Month.SEPTEMBER, 23),
-                LocalTime.of(17, 0))
-        log.info("stations: $result")
+        val timetable = bahnApiService.fetchTimetable(8000207,
+                LocalDate.of(2023, Month.OCTOBER, 1),
+                LocalTime.of(3, 0))
+        log.info { "bs" }
     }
 
     companion object {
