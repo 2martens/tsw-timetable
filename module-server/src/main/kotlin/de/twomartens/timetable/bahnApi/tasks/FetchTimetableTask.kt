@@ -1,5 +1,6 @@
 package de.twomartens.timetable.bahnApi.tasks
 
+import de.twomartens.timetable.bahnApi.repository.ScheduledFetchTaskRepository
 import de.twomartens.timetable.bahnApi.service.BahnApiService
 import de.twomartens.timetable.bahnApi.service.BahnDatabaseService
 import org.springframework.scheduling.annotation.Async
