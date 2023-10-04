@@ -12,6 +12,7 @@ open class ThreadPoolTaskExecutorConfig {
     open fun threadPoolTaskExecutor(): ThreadPoolTaskExecutor {
         val executor = ThreadPoolTaskExecutor()
         executor.corePoolSize = CORE_POOL_SIZE
+        executor.maxPoolSize = CORE_POOL_SIZE
         return executor
     }
 }
