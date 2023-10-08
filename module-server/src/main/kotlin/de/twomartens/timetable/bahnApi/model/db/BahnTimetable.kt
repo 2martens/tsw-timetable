@@ -1,6 +1,8 @@
 package de.twomartens.timetable.bahnApi.model.db
 
 import de.twomartens.timetable.bahnApi.model.dto.BahnStationStop
+import de.twomartens.timetable.model.Eva
+import de.twomartens.timetable.model.NonEmptyString
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
@@ -14,9 +16,9 @@ import java.time.LocalDateTime
 @Document
 @CompoundIndex(def = "{'eva': 1, 'dateTime': 1}", unique = true)
 data class BahnTimetable(
-        var eva: Int,
+        var eva: Eva,
         var dateTime: LocalDateTime,
-        @TextIndexed var station: String,
+        @TextIndexed var station: NonEmptyString,
         var stops: List<BahnStationStop>
 ) {
     @Id

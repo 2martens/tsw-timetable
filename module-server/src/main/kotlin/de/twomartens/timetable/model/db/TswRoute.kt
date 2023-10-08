@@ -1,6 +1,7 @@
 package de.twomartens.timetable.model.db
 
 import de.twomartens.timetable.model.Eva
+import de.twomartens.timetable.model.NonEmptyString
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
@@ -11,7 +12,7 @@ import java.time.Instant
 
 @Document
 data class TswRoute(
-        @Indexed(unique = true) var name: String,
+        @Indexed(unique = true) var name: NonEmptyString,
         /**
          * Ordered list of stations that represent the order of stations on the route.
          *

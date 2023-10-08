@@ -1,5 +1,7 @@
 package de.twomartens.timetable.bahnApi.model.db
 
+import de.twomartens.timetable.model.Eva
+import de.twomartens.timetable.model.NonEmptyString
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
@@ -11,8 +13,8 @@ import java.time.Instant
 
 @Document
 data class BahnStation(
-        @TextIndexed var name: String,
-        @Indexed(unique = true) var eva: Int?,
+        @TextIndexed var name: NonEmptyString,
+        @Indexed(unique = true) var eva: Eva,
         var ds100: String,
         var db: Boolean
 ) {
