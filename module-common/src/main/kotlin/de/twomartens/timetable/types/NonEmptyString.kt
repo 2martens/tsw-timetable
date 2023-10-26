@@ -1,9 +1,9 @@
 package de.twomartens.timetable.types
 
 @JvmInline
-value class NonEmptyString(val name: String) {
+value class NonEmptyString(val value: String) {
     init {
-        require(name.isNotBlank()) {
+        require(value.isNotBlank()) {
             "Name must not be blank"
         }
     }
