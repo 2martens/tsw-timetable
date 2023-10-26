@@ -15,7 +15,8 @@ class TaskFactory {
     private val _tasksPerHour: MutableMap<HourAtDay, Int> = mutableMapOf()
 
     fun initializeWithExistingTasks(existingTasks: List<ScheduledFetchTask>) {
-        existingTasks.forEach { countTask(it) }
+        resetCounter()
+        countTasks(existingTasks)
     }
 
     fun createTaskAndUpdateCounter(eva: Eva, hourAtDay: HourAtDay): ScheduledFetchTask {
@@ -41,6 +42,10 @@ class TaskFactory {
         return hourAtDay.dateTime.plusSeconds(secondInHourToExecute.toLong())
     }
 
+    private fun countTasks(existingTasks: List<ScheduledFetchTask>) {
+        existingTasks.forEach { countTask(it) }
+    }
+
     private fun countTask(scheduledFetchTask: ScheduledFetchTask) {
         val scheduledTime = scheduledFetchTask.scheduledExecutionDateTime
         val hourAtDay = HourAtDay.of(scheduledTime)
@@ -55,4 +60,7 @@ class TaskFactory {
     private fun getNumberOfTasksInHour(hourAtDay: HourAtDay) =
             _tasksPerHour.computeIfAbsent(hourAtDay) { ZERO }
 
+    private fun resetCounter() {
+        _tasksPerHour.clear()
+    }
 }
