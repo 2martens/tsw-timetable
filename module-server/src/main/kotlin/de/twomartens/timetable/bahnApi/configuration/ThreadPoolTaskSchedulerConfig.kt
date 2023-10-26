@@ -1,11 +1,10 @@
-package de.twomartens.timetable.configuration
+package de.twomartens.timetable.bahnApi.configuration
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 
 private const val POOL_SIZE = 1
-
 private const val THREAD_NAME_PREFIX = "ThreadPoolTaskScheduler"
 
 @Configuration

@@ -6,9 +6,9 @@ import de.twomartens.timetable.bahnApi.model.dto.BahnStation
 import de.twomartens.timetable.bahnApi.model.dto.BahnTimetable
 import de.twomartens.timetable.bahnApi.repository.BahnStationRepository
 import de.twomartens.timetable.bahnApi.repository.BahnTimetableRepository
+import de.twomartens.timetable.model.base.HourAtDay
 import org.mapstruct.factory.Mappers
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class BahnDatabaseService(
@@ -23,7 +23,7 @@ class BahnDatabaseService(
                 .map { bahnStationMapper.mapToDB(it) })
     }
 
-    fun storeTimetable(timetable: BahnTimetable, dateTime: LocalDateTime) {
-        bahnTimetableRepository.save(bahnTimetableMapper.mapToDB(timetable, dateTime))
+    fun storeTimetable(timetable: BahnTimetable, hourAtDay: HourAtDay) {
+        bahnTimetableRepository.save(bahnTimetableMapper.mapToDB(timetable, hourAtDay.dateTime))
     }
 }

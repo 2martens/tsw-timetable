@@ -1,6 +1,5 @@
 package de.twomartens.timetable.model.db
 
-import de.twomartens.timetable.model.Eva
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
@@ -11,7 +10,7 @@ import java.time.Instant
 
 @Document
 data class Station(
-        @Indexed(unique = true) var eva: Eva,
+        @Indexed(unique = true) var stationId: StationId,
         var name: String,
         var platforms: List<Platform>
 ) {

@@ -1,8 +1,8 @@
 package de.twomartens.timetable.bahnApi.model.db
 
+import de.twomartens.timetable.bahnApi.model.Eva
 import de.twomartens.timetable.bahnApi.model.dto.BahnStationStop
-import de.twomartens.timetable.model.Eva
-import de.twomartens.timetable.model.NonEmptyString
+import de.twomartens.timetable.model.base.NonEmptyString
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id

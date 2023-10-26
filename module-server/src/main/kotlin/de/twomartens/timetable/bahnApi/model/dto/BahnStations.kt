@@ -10,5 +10,5 @@ import jakarta.xml.bind.annotation.XmlRootElement
 data class BahnStations(
     @field:XmlElement(name = "station") var stations: List<BahnStation>
 ) {
-    constructor(): this(mutableListOf())
+    constructor() : this(listOf())
 }

@@ -1,22 +1,17 @@
-package de.twomartens.timetable.bahnApi.model.db
+package de.twomartens.timetable.model.db
 
-import de.twomartens.timetable.bahnApi.model.Eva
 import de.twomartens.timetable.model.base.NonEmptyString
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
-import org.springframework.data.mongodb.core.index.Indexed
-import org.springframework.data.mongodb.core.index.TextIndexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
 @Document
-data class BahnStation(
-        @TextIndexed var name: NonEmptyString,
-        @Indexed(unique = true) var eva: Eva,
-        var ds100: String,
-        var db: Boolean
+data class User(
+        var userId: UserId,
+        var name: NonEmptyString
 ) {
     @Id
     var id: ObjectId = ObjectId()

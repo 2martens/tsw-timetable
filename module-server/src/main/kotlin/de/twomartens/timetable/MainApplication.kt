@@ -1,6 +1,6 @@
 package de.twomartens.timetable
 
-import de.twomartens.timetable.service.ScheduledTaskService
+import de.twomartens.timetable.bahnApi.service.ScheduledTaskService
 import mu.KotlinLogging
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.event.ApplicationReadyEvent

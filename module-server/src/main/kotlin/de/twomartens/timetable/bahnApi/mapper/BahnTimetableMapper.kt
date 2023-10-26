@@ -1,6 +1,7 @@
 package de.twomartens.timetable.bahnApi.mapper
 
 import de.twomartens.timetable.bahnApi.model.db.BahnTimetable
+import de.twomartens.timetable.model.base.NonEmptyString
 import org.mapstruct.*
 import java.time.LocalDateTime
 
@@ -16,9 +17,9 @@ interface BahnTimetableMapper {
     fun mapToDB(dto: de.twomartens.timetable.bahnApi.model.dto.BahnTimetable,
                 dateTime: LocalDateTime): BahnTimetable {
         return BahnTimetable(
-                dto.eva!!,
+                dto.eva,
                 dateTime,
-                dto.station,
+                NonEmptyString(dto.station),
                 dto.stops
         )
     }

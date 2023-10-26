@@ -1,4 +1,4 @@
-package de.twomartens.timetable.model
+package de.twomartens.timetable.model.base
 
 @JvmInline
 value class NonEmptyString(val name: String) {

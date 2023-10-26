@@ -1,4 +1,4 @@
-package de.twomartens.timetable.configuration
+package de.twomartens.timetable.bahnApi.configuration
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -8,6 +8,7 @@ private const val CORE_POOL_SIZE = 1
 
 @Configuration
 open class ThreadPoolTaskExecutorConfig {
+
     @Bean
     open fun threadPoolTaskExecutor(): ThreadPoolTaskExecutor {
         val executor = ThreadPoolTaskExecutor()

@@ -11,8 +11,7 @@ data class BahnTripLabel(
     @field:XmlAttribute(name = "f") var filterFlags: String,
     @field:XmlAttribute(name = "n") var trainNumber: String,
     @field:XmlAttribute(name = "o") var owner: String,
-    @field:XmlAttribute(name = "t") var tripType: BahnTripType?
+    @field:XmlAttribute(name = "t") var tripType: BahnTripType
 ) {
-    constructor(): this("", "", "", "",
-            null)
+    constructor() : this("", "", "", "", BahnTripType.p)
 }

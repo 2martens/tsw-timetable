@@ -14,8 +14,8 @@ open class DeleteScheduledTask(
         log.info {
             "Delete scheduled fetch task after the fetch occurred: " +
                     "[eva: ${scheduledFetchTask.eva}], " +
-                    "[date: ${scheduledFetchTask.fetchedDate}], " +
-                    "[time: ${scheduledFetchTask.fetchedTime}]"
+                    "[date: ${scheduledFetchTask.fetchedDateTime.date}], " +
+                    "[time: ${scheduledFetchTask.fetchedDateTime.hour}]"
         }
         scheduledFetchTaskRepository.delete(scheduledFetchTask)
     }

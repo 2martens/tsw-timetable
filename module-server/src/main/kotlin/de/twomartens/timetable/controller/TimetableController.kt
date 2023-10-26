@@ -1,8 +1,9 @@
 package de.twomartens.timetable.controller
 
-import de.twomartens.timetable.model.NonEmptyString
+import de.twomartens.timetable.bahnApi.service.ScheduledTaskService
+import de.twomartens.timetable.model.base.NonEmptyString
+import de.twomartens.timetable.model.db.UserId
 import de.twomartens.timetable.repository.TswRouteRepository
-import de.twomartens.timetable.service.ScheduledTaskService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -34,8 +35,11 @@ class TimetableController(
                     description = "Request does not follow specification"
             )]
     )
-    @PostMapping("/{routeName}/fetchTimetable/{date}")
+    @PostMapping("/{userId}/{routeName}/fetchTimetable/{date}")
     fun scheduleFetch(
+            @PathVariable @Parameter(description = "The id of the user",
+                    example = "1",
+                    required = true) userId: UserId,
             @PathVariable @Parameter(description = "The name of the TSW route.",
                     example = "CologneAachen",
                     required = true) routeName: NonEmptyString,
@@ -47,7 +51,7 @@ class TimetableController(
         if (!date.isAfter(LocalDate.now(clock))) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Date must be in the future")
         }
-        val route = routeRepository.findByName(routeName)
+        val route = routeRepository.findByUserIdAndName(userId, routeName)
                 ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Route name must belong to existing route")
         scheduledTaskService.scheduleTimetableFetch(route, date)
