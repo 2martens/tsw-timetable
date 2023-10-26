@@ -1,6 +1,6 @@
 package de.twomartens.timetable.model.db
 
-import de.twomartens.timetable.model.base.NonEmptyString
+import de.twomartens.timetable.types.NonEmptyString
 import kotlin.time.Duration
 
 data class Depot(

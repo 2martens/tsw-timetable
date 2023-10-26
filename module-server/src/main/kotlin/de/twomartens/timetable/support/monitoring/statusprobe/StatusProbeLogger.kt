@@ -19,8 +19,8 @@ class StatusProbeLogger internal constructor(private val clock: Clock, private v
     }
 
     fun logStatusChange(
-        name: String, message: String?, status: Status, lastStatusChange: ZonedDateTime?,
-        throwable: Throwable?
+            name: String, message: String?, status: Status, lastStatusChange: ZonedDateTime?,
+            throwable: Throwable?
     ) {
         var probeIdent = getProbeIdent(name)
         if (probeIdent == null) {
@@ -32,8 +32,8 @@ class StatusProbeLogger internal constructor(private val clock: Clock, private v
 
     private fun getProbeIdent(name: String): ProbeIdent? {
         return statusProbeToStatus.keys.asSequence()
-            .filter { it.name == name }
-            .firstOrNull()
+                .filter { it.name == name }
+                .firstOrNull()
     }
 
     private fun createLog(message: String?, lastStatusChange: ZonedDateTime?, throwable: Throwable?) {
@@ -42,7 +42,7 @@ class StatusProbeLogger internal constructor(private val clock: Clock, private v
         val criticality = overallCriticality
         if (Status.UP == overallStatus) {
             commLog.info(
-                MARKER, StringMapMessage()
+                    MARKER, StringMapMessage()
                     .with(LABEL_CRITICALITY, criticality)
                     .with(LABEL_STATUS, overallStatus)
                     .with(LABEL_MESSAGE, cleanedMessage)
@@ -50,7 +50,7 @@ class StatusProbeLogger internal constructor(private val clock: Clock, private v
             )
         } else {
             commLog.error(
-                MARKER, StringMapMessage()
+                    MARKER, StringMapMessage()
                     .with(LABEL_CRITICALITY, criticality)
                     .with(LABEL_STATUS, overallStatus)
                     .with(LABEL_MESSAGE, cleanedMessage)
@@ -63,8 +63,8 @@ class StatusProbeLogger internal constructor(private val clock: Clock, private v
     private val overallCriticality: StatusProbeCriticality
         get() {
             val crits = statusProbeToStatus.keys.asSequence()
-                .map { it.criticality }
-                .toList()
+                    .map { it.criticality }
+                    .toList()
             return if (crits.contains(StatusProbeCriticality.K1)) StatusProbeCriticality.K1
             else if (crits.contains(StatusProbeCriticality.K2)) StatusProbeCriticality.K2
             else StatusProbeCriticality.K3
@@ -77,9 +77,9 @@ class StatusProbeLogger internal constructor(private val clock: Clock, private v
     private val reason: String
         get() {
             val probesDown = statusProbeToStatus.entries.asSequence()
-                .filter { it.value == Status.DOWN }
-                .map { it.key }
-                .toList()
+                    .filter { it.value == Status.DOWN }
+                    .map { it.key }
+                    .toList()
             val reasonK1 = getDownStatusProbes(probesDown, StatusProbeCriticality.K1)
             val reasonK2 = getDownStatusProbes(probesDown, StatusProbeCriticality.K2)
             val reasonK3 = getDownStatusProbes(probesDown, StatusProbeCriticality.K3)
@@ -88,9 +88,9 @@ class StatusProbeLogger internal constructor(private val clock: Clock, private v
 
     private fun getDownStatusProbes(probesDown: List<ProbeIdent>, criticality: StatusProbeCriticality): String {
         val downProbeNames = probesDown.asSequence()
-            .filter { it.criticality == criticality }
-            .map { it.name }
-            .toList()
+                .filter { it.criticality == criticality }
+                .map { it.name }
+                .toList()
         return if (downProbeNames.isNotEmpty()) {
             "$criticality failed: ${downProbeNames.joinToString(separator = ",")}\n"
         } else ""

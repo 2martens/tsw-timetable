@@ -44,8 +44,8 @@ class HeaderInterceptorRest : HeaderInterceptor(), HandlerInterceptor, ClientHtt
     // ClientHttpRequestInterceptor
     @Throws(IOException::class)
     override fun intercept(
-        request: HttpRequest, body: ByteArray,
-        execution: ClientHttpRequestExecution
+            request: HttpRequest, body: ByteArray,
+            execution: ClientHttpRequestExecution
     ): ClientHttpResponse {
         request.headers.add(HEADER_FIELD_TRACE_ID, getTraceId())
         val requestType = getRequestType()
@@ -63,8 +63,8 @@ class HeaderInterceptorRest : HeaderInterceptor(), HandlerInterceptor, ClientHtt
 
     // HandlerInterceptor
     override fun preHandle(
-        request: HttpServletRequest, response: HttpServletResponse,
-        handler: Any
+            request: HttpServletRequest, response: HttpServletResponse,
+            handler: Any
     ): Boolean {
         val traceId = extractTraceId(request)
         val requestType = extractRequestType(request)

@@ -9,6 +9,6 @@ import java.time.ZoneId
 @RefreshScope
 @ConfigurationProperties(prefix = "time")
 @Schema(description = "Properties to configure time")
-data class  TimeProperties @ConstructorBinding constructor(
-    val defaultTimeZone: ZoneId
+data class TimeProperties @ConstructorBinding constructor(
+        val defaultTimeZone: ZoneId
 )

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @ControllerAdvice(annotations = [RestController::class])
-class ExceptionController: ResponseEntityExceptionHandler() {
+class ExceptionController : ResponseEntityExceptionHandler() {
     @ExceptionHandler(HttpStatusException::class)
     fun handleException(e: HttpStatusException): ResponseEntity<ErrorMessage> {
         if (e.cause != null) {

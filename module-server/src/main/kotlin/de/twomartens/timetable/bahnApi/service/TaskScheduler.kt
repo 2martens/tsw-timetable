@@ -6,8 +6,8 @@ import de.twomartens.timetable.bahnApi.repository.ScheduledFetchTaskRepository
 import de.twomartens.timetable.bahnApi.tasks.DeleteScheduledTask
 import de.twomartens.timetable.bahnApi.tasks.FetchTimetableTask
 import de.twomartens.timetable.bahnApi.tasks.StoreTimetableTask
-import de.twomartens.timetable.model.base.HourAtDay
 import de.twomartens.timetable.property.TimeProperties
+import de.twomartens.timetable.types.HourAtDay
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import org.springframework.stereotype.Service

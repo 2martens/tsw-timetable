@@ -65,7 +65,8 @@ class VersionHtmlController {
             JarFile(jarFileName).use { jarFile ->
                 val entry = jarFile.getEntry(JarFile.MANIFEST_NAME)
                 jarFile.getInputStream(entry).use { `in` ->
-                    return String(`in`.readAllBytes(), StandardCharsets.UTF_8).lines().toList() }
+                    return String(`in`.readAllBytes(), StandardCharsets.UTF_8).lines().toList()
+                }
             }
         } catch (ignored: FileNotFoundException) {
             // do nothing if manifest file is not available

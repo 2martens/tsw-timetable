@@ -5,9 +5,9 @@ import de.twomartens.timetable.bahnApi.model.FetchDates
 import de.twomartens.timetable.bahnApi.model.TaskFactory
 import de.twomartens.timetable.bahnApi.model.db.ScheduledFetchTask
 import de.twomartens.timetable.bahnApi.repository.ScheduledFetchTaskRepository
-import de.twomartens.timetable.model.base.Hour
-import de.twomartens.timetable.model.base.HourAtDay
 import de.twomartens.timetable.model.db.TswRoute
+import de.twomartens.timetable.types.Hour
+import de.twomartens.timetable.types.HourAtDay
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import java.time.LocalDate

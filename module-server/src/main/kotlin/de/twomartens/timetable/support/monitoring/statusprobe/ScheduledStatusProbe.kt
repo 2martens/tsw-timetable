@@ -7,11 +7,11 @@ import java.time.Duration
 interface ScheduledStatusProbe {
     fun runScheduledTask()
     fun scheduleTask(
-        threadPoolTaskScheduler: ThreadPoolTaskScheduler,
-        schedulePeriod: Duration
+            threadPoolTaskScheduler: ThreadPoolTaskScheduler,
+            schedulePeriod: Duration
     ) {
         val periodicTrigger = PeriodicTrigger(
-            Duration.ofSeconds(schedulePeriod.toSeconds())
+                Duration.ofSeconds(schedulePeriod.toSeconds())
         )
         threadPoolTaskScheduler.schedule(periodicTrigger) { runScheduledTask() }
     }

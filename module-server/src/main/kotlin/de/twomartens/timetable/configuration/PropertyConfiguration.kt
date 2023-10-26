@@ -10,5 +10,5 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @EnableConfigurationProperties(RestTemplateTimeoutProperties::class, ServiceProperties::class,
-    StatusProbeProperties::class, TimeProperties::class, BahnApiProperties::class)
+        StatusProbeProperties::class, TimeProperties::class, BahnApiProperties::class)
 open class PropertyConfiguration

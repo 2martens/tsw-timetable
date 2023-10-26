@@ -35,14 +35,14 @@ class LoggingInterceptorRest(
 
     @Throws(IOException::class, ServletException::class)
     override fun doFilter(
-        request: ServletRequest, response: ServletResponse,
-        chain: FilterChain
+            request: ServletRequest, response: ServletResponse,
+            chain: FilterChain
     ) {
         val requestTime = ZonedDateTime.now(clock)
         val httpRequest = request as HttpServletRequest
         val requestWrapper = ContentCachingRequestWrapper(httpRequest)
         val responseWrapper = ContentCachingResponseWrapper(
-            (response as HttpServletResponse)
+                (response as HttpServletResponse)
         )
         var fullResponseBytes: ByteArray? = null
         var throwable: Throwable? = null
@@ -51,8 +51,8 @@ class LoggingInterceptorRest(
         try {
             try {
                 chain.doFilter(
-                    if (requestLogBehaviour != FieldLogBehaviour.NEVER) requestWrapper else httpRequest,
-                    responseWrapper
+                        if (requestLogBehaviour != FieldLogBehaviour.NEVER) requestWrapper else httpRequest,
+                        responseWrapper
                 )
                 if (responseLogBehaviour != FieldLogBehaviour.NEVER) {
                     fullResponseBytes = responseWrapper.contentAsByteArray
@@ -68,58 +68,58 @@ class LoggingInterceptorRest(
             try {
                 val responseSize = responseWrapper.contentSize
                 val responseHeaders = extractHeaders(
-                    headerNames = responseWrapper.headerNames.iterator()
+                        headerNames = responseWrapper.headerNames.iterator()
                 ) { responseWrapper.getHeaders(it).iterator() }
                 if (
-                    (responseLogBehaviour == FieldLogBehaviour.ONLY_ON_ERROR && isError(httpStatusCode)
-                            || responseLogBehaviour == FieldLogBehaviour.ALWAYS)
-                    && fullResponseBytes != null
+                        (responseLogBehaviour == FieldLogBehaviour.ONLY_ON_ERROR && isError(httpStatusCode)
+                                || responseLogBehaviour == FieldLogBehaviour.ALWAYS)
+                        && fullResponseBytes != null
                 ) {
                     responseBody = String(
-                        fullResponseBytes,
-                        determineResponseEncoding()
+                            fullResponseBytes,
+                            determineResponseEncoding()
                     )
                 }
                 val query = if (httpRequest.queryString != null) "?${httpRequest.queryString}" else ""
                 val requestUrl = URL("${httpRequest.requestURL}$query")
                 val requestHeaders = extractHeaders(
-                    headerNames = httpRequest.headerNames.asIterator(),
-                    ignoreList = listOf("authorization")) {
+                        headerNames = httpRequest.headerNames.asIterator(),
+                        ignoreList = listOf("authorization")) {
                     httpRequest.getHeaders(it).asIterator()
                 }
                 var requestBody: String? = null
                 var businessType: String? = null
                 if (requestLogBehaviour == FieldLogBehaviour.ONLY_ON_ERROR && isError(httpStatusCode)
-                    || requestLogBehaviour == FieldLogBehaviour.ALWAYS
+                        || requestLogBehaviour == FieldLogBehaviour.ALWAYS
                 ) {
                     val fullRequestBytes = requestWrapper.contentAsByteArray
                     requestBody = String(fullRequestBytes, determineRequestEncoding())
                     businessType = determineBusinessType()
                 }
                 log(
-                    LogMessage(
-                        requestHeaders = requestHeaders,
-                        responseHeaders = responseHeaders,
-                        url = requestUrl,
-                        method = httpRequest.method,
-                        requestMimeType = typeToString(request.getContentType()),
-                        responseMimeType = typeToString(response.getContentType()),
-                        requestBody = requestBody,
-                        responseBody = responseBody,
-                        requestSize = httpRequest.contentLength,
-                        responseSize = responseSize,
-                        httpStatus = httpStatusCode,
-                        direction = DIRECTION_IN,
-                        requestTime = requestTime,
-                        responseTime = ZonedDateTime.now(clock),
-                        traceId = HeaderInterceptor.getTraceId(),
-                        requestType = HeaderInterceptor.getRequestType(),
-                        businessType = businessType,
-                        throwable = throwable
-                    )
+                        LogMessage(
+                                requestHeaders = requestHeaders,
+                                responseHeaders = responseHeaders,
+                                url = requestUrl,
+                                method = httpRequest.method,
+                                requestMimeType = typeToString(request.getContentType()),
+                                responseMimeType = typeToString(response.getContentType()),
+                                requestBody = requestBody,
+                                responseBody = responseBody,
+                                requestSize = httpRequest.contentLength,
+                                responseSize = responseSize,
+                                httpStatus = httpStatusCode,
+                                direction = DIRECTION_IN,
+                                requestTime = requestTime,
+                                responseTime = ZonedDateTime.now(clock),
+                                traceId = HeaderInterceptor.getTraceId(),
+                                requestType = HeaderInterceptor.getRequestType(),
+                                businessType = businessType,
+                                throwable = throwable
+                        )
                 )
                 val interceptorCloseables =
-                    request.getAttribute(HeaderInterceptorRest.CLASS_NAME) as HeaderInterceptor.InterceptorCloseables
+                        request.getAttribute(HeaderInterceptorRest.CLASS_NAME) as HeaderInterceptor.InterceptorCloseables
                 interceptorCloseables.close()
             } catch (e: java.lang.RuntimeException) {
                 log.error(e.toString(), e)
@@ -133,8 +133,8 @@ class LoggingInterceptorRest(
 
     @Throws(IOException::class)
     override fun intercept(
-        request: HttpRequest,
-        requestBytes: ByteArray, execution: ClientHttpRequestExecution
+            request: HttpRequest,
+            requestBytes: ByteArray, execution: ClientHttpRequestExecution
     ): ClientHttpResponse {
         val requestTime = ZonedDateTime.now(clock)
         var responseSize = 0
@@ -147,7 +147,7 @@ class LoggingInterceptorRest(
         var businessType: String? = null
         return try {
             val result = BufferingClientHttpResponseWrapper(
-                execution.execute(request, requestBytes)
+                    execution.execute(request, requestBytes)
             )
             val responseBytes = StreamUtils.copyToByteArray(result.getBody())
             responseSize = responseBytes.size
@@ -155,11 +155,11 @@ class LoggingInterceptorRest(
             responseMediaType = result.headers.getContentType()
             httpStatusCode = result.statusCode.value()
             if (responseLogBehaviour == FieldLogBehaviour.ONLY_ON_ERROR && isError(httpStatusCode)
-                || responseLogBehaviour == FieldLogBehaviour.ALWAYS
+                    || responseLogBehaviour == FieldLogBehaviour.ALWAYS
             ) {
                 responseBody = String(
-                    responseBytes,
-                    determineRequestEncoding()
+                        responseBytes,
+                        determineRequestEncoding()
                 )
             }
             result
@@ -171,35 +171,35 @@ class LoggingInterceptorRest(
                 val url = request.uri.toURL()
                 val requestHeaders: Map<String, Collection<String>> = extractHeaders(request.headers)
                 if (requestLogBehaviour == FieldLogBehaviour.ONLY_ON_ERROR && isError(httpStatusCode)
-                    || requestLogBehaviour == FieldLogBehaviour.ALWAYS
+                        || requestLogBehaviour == FieldLogBehaviour.ALWAYS
                 ) {
                     requestBody = String(
-                        requestBytes,
-                        determineRequestEncoding()
+                            requestBytes,
+                            determineRequestEncoding()
                     )
                     businessType = determineBusinessType()
                 }
                 log(
-                    LogMessage(
-                        requestHeaders = requestHeaders,
-                        responseHeaders = responseHeaders,
-                        url = url,
-                        method = request.method.name(),
-                        requestMimeType = typeToString(request.headers.getContentType()),
-                        requestBody = requestBody,
-                        responseBody = responseBody,
-                        responseMimeType = typeToString(responseMediaType!!),
-                        requestSize = requestBytes.size,
-                        responseSize = responseSize,
-                        httpStatus = httpStatusCode,
-                        direction = DIRECTION_OUT,
-                        requestTime = requestTime,
-                        responseTime = ZonedDateTime.now(clock),
-                        businessType = businessType,
-                        throwable = throwable,
-                        traceId = HeaderInterceptorRest.extractTraceId(request),
-                        requestType = HeaderInterceptorRest.extractRequestType(request),
-                    )
+                        LogMessage(
+                                requestHeaders = requestHeaders,
+                                responseHeaders = responseHeaders,
+                                url = url,
+                                method = request.method.name(),
+                                requestMimeType = typeToString(request.headers.getContentType()),
+                                requestBody = requestBody,
+                                responseBody = responseBody,
+                                responseMimeType = typeToString(responseMediaType!!),
+                                requestSize = requestBytes.size,
+                                responseSize = responseSize,
+                                httpStatus = httpStatusCode,
+                                direction = DIRECTION_OUT,
+                                requestTime = requestTime,
+                                responseTime = ZonedDateTime.now(clock),
+                                businessType = businessType,
+                                throwable = throwable,
+                                traceId = HeaderInterceptorRest.extractTraceId(request),
+                                requestType = HeaderInterceptorRest.extractRequestType(request),
+                        )
                 )
             } catch (e: java.lang.RuntimeException) {
                 log.error(e.toString(), e)
@@ -210,18 +210,18 @@ class LoggingInterceptorRest(
     private fun log(logMessage: LogMessage) {
         val stringMapMessage = StringMapMessage()
         addLogString(
-            stringMapMessage, PARAM_REQUEST_HEADERS,
-            toHeaderString(logMessage.requestHeaders)
+                stringMapMessage, PARAM_REQUEST_HEADERS,
+                toHeaderString(logMessage.requestHeaders)
         )
         addLogString(
-            stringMapMessage, PARAM_RESPONSE_HEADERS,
-            toHeaderString(logMessage.responseHeaders)
+                stringMapMessage, PARAM_RESPONSE_HEADERS,
+                toHeaderString(logMessage.responseHeaders)
         )
         addLogString(stringMapMessage, PARAM_URL_FULL, logMessage.url.toString())
         addLogString(stringMapMessage, PARAM_URL_DOMAIN, logMessage.url.host)
         addLogString(
-            stringMapMessage, PARAM_URL_EXTENSION,
-            extractExtension(logMessage.url.path)
+                stringMapMessage, PARAM_URL_EXTENSION,
+                extractExtension(logMessage.url.path)
         )
         addLogString(stringMapMessage, PARAM_URL_PATH, logMessage.url.path)
         addLogString(stringMapMessage, PARAM_URL_PORT, logMessage.url.port.toString())
@@ -229,8 +229,8 @@ class LoggingInterceptorRest(
         addLogString(stringMapMessage, PARAM_URL_QUERY, logMessage.url.query)
         addLogString(stringMapMessage, PARAM_REQUEST_METHOD, logMessage.method)
         addLogString(
-            stringMapMessage, PARAM_REQUEST_REFERER,
-            getHeader(logMessage.requestHeaders, HttpHeaders.REFERER)
+                stringMapMessage, PARAM_REQUEST_REFERER,
+                getHeader(logMessage.requestHeaders, HttpHeaders.REFERER)
         )
         addLogString(stringMapMessage, PARAM_REQUEST_MIMETYPE, logMessage.requestMimeType)
         addLogString(stringMapMessage, PARAM_RESPONSE_MIMETYPE, logMessage.responseMimeType)
@@ -240,21 +240,21 @@ class LoggingInterceptorRest(
         addLogString(stringMapMessage, PARAM_DIRECTION, logMessage.direction)
         addLogString(stringMapMessage, PARAM_PROTOCOL, PROTOCOL_NAME)
         addLogString(
-            stringMapMessage, PARAM_REQUEST_TIME,
-            logMessage.requestTime.format(DATE_TIME_FORMATTER)
+                stringMapMessage, PARAM_REQUEST_TIME,
+                logMessage.requestTime.format(DATE_TIME_FORMATTER)
         )
         addLogString(
-            stringMapMessage, PARAM_RESPONSE_TIME,
-            logMessage.responseTime.format(DATE_TIME_FORMATTER)
+                stringMapMessage, PARAM_RESPONSE_TIME,
+                logMessage.responseTime.format(DATE_TIME_FORMATTER)
         )
         addLogString(
-            stringMapMessage,
-            PARAM_DURATION,
-            getDurationBetweenRequestAndResponseTime(logMessage).toNanos().toString()
+                stringMapMessage,
+                PARAM_DURATION,
+                getDurationBetweenRequestAndResponseTime(logMessage).toNanos().toString()
         )
         addLogString(
-            stringMapMessage, PARAM_USER_AGENT,
-            getHeader(logMessage.requestHeaders, HttpHeaders.USER_AGENT)
+                stringMapMessage, PARAM_USER_AGENT,
+                getHeader(logMessage.requestHeaders, HttpHeaders.USER_AGENT)
         )
         addLogString(stringMapMessage, HeaderInterceptor.LOGGER_TRACE_ID, logMessage.traceId)
         addLogString(stringMapMessage, HeaderInterceptor.LOGGER_REQTYPE_ID, logMessage.requestType)
@@ -270,9 +270,9 @@ class LoggingInterceptorRest(
 
     private fun getHeader(headers: Map<String, Collection<String?>>, headerKey: String): String? {
         return headers.entries.asSequence()
-            .filter { it.key.equals(headerKey, ignoreCase = true) }
-            .flatMap { it.value.asSequence() }
-            .firstOrNull()
+                .filter { it.key.equals(headerKey, ignoreCase = true) }
+                .flatMap { it.value.asSequence() }
+                .firstOrNull()
     }
 
     private fun addLogString(stringMapMessage: StringMapMessage, key: String, value: String?) {
@@ -340,9 +340,9 @@ class LoggingInterceptorRest(
         const val PARAM_PROTOCOL = "network.protocol"
 
         private fun extractHeaders(
-            headerNames: Iterator<String>,
-            ignoreList: List<String> = emptyList(),
-            headerValuesSupplier: Function<String, Iterator<String>>
+                headerNames: Iterator<String>,
+                ignoreList: List<String> = emptyList(),
+                headerValuesSupplier: Function<String, Iterator<String>>
         ): Map<String, MutableCollection<String>> {
             val requestHeaders: MutableMap<String, MutableCollection<String>> = mutableMapOf()
             while (headerNames.hasNext()) {
@@ -367,12 +367,12 @@ class LoggingInterceptorRest(
 
         private fun toHeaderString(headerMap: Map<String, Collection<String>>): String {
             return headerMap.entries.asSequence()
-                .flatMap { entry ->
-                    val key = entry.key
-                    entry.value.asSequence().map { Pair(key, it) }
-                }
-                .map { "${it.first}=${it.second}" }
-                .joinToString(separator = ",")
+                    .flatMap { entry ->
+                        val key = entry.key
+                        entry.value.asSequence().map { Pair(key, it) }
+                    }
+                    .map { "${it.first}=${it.second}" }
+                    .joinToString(separator = ",")
         }
 
         private fun typeToString(contentType: String?): String? {
@@ -408,24 +408,24 @@ class LoggingInterceptorRest(
         }
 
         private data class LogMessage(
-            val requestHeaders: Map<String, Collection<String>>,
-            val responseHeaders: Map<String, Collection<String>>,
-            val url: URL,
-            val method: String,
-            val requestMimeType: String?,
-            val responseMimeType: String?,
-            val requestBody: String?,
-            val responseBody: String?,
-            val requestSize: Int,
-            val responseSize: Int,
-            val httpStatus: Int,
-            val direction: String,
-            val requestTime: ZonedDateTime,
-            val responseTime: ZonedDateTime,
-            val traceId: String?,
-            val requestType: String?,
-            val businessType: String?,
-            val throwable: Throwable?
+                val requestHeaders: Map<String, Collection<String>>,
+                val responseHeaders: Map<String, Collection<String>>,
+                val url: URL,
+                val method: String,
+                val requestMimeType: String?,
+                val responseMimeType: String?,
+                val requestBody: String?,
+                val responseBody: String?,
+                val requestSize: Int,
+                val responseSize: Int,
+                val httpStatus: Int,
+                val direction: String,
+                val requestTime: ZonedDateTime,
+                val responseTime: ZonedDateTime,
+                val traceId: String?,
+                val requestType: String?,
+                val businessType: String?,
+                val throwable: Throwable?
         )
 
         enum class FieldLogBehaviour {

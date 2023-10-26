@@ -11,8 +11,8 @@ import java.time.Duration
 import java.util.*
 
 abstract class AbstractHealthIndicator(
-    private val clock: Clock,
-    private val preparable: Preparable
+        private val clock: Clock,
+        private val preparable: Preparable
 ) : HealthIndicator {
 
     private val logStatusDownMessage = "health indicator '${indicatorName()}' invoked with status '${Status.DOWN.code}'"
@@ -67,8 +67,8 @@ abstract class AbstractHealthIndicator(
 
     private fun indicatorName(): String {
         return this.javaClass.getSimpleName()
-            .replace("HealthIndicator", "")
-            .lowercase(Locale.getDefault())
+                .replace("HealthIndicator", "")
+                .lowercase(Locale.getDefault())
     }
 
     companion object {

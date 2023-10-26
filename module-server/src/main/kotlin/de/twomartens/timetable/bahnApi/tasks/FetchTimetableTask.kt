@@ -3,7 +3,7 @@ package de.twomartens.timetable.bahnApi.tasks
 import de.twomartens.timetable.bahnApi.model.Eva
 import de.twomartens.timetable.bahnApi.service.BahnApiService
 import de.twomartens.timetable.bahnApi.service.TaskScheduler
-import de.twomartens.timetable.model.base.HourAtDay
+import de.twomartens.timetable.types.HourAtDay
 import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Async
 

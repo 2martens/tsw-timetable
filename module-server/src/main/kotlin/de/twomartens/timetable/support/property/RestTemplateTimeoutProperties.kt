@@ -8,8 +8,8 @@ import java.time.temporal.ChronoUnit
 
 @ConfigurationProperties(prefix = "resttemplate.timeout")
 data class RestTemplateTimeoutProperties @ConstructorBinding constructor(
-    @DurationUnit(ChronoUnit.MILLIS) val readTimeoutRestHealthIndicatorInMillis: Duration,
-    @DurationUnit(ChronoUnit.MILLIS) val connectionRestHealthIndicatorTimeoutInMillis: Duration,
-    @DurationUnit(ChronoUnit.MILLIS) val readTimeoutRestTemplateInMillis: Duration,
-    @DurationUnit(ChronoUnit.MILLIS) val connectionRestTemplateTimeoutInMillis: Duration
+        @DurationUnit(ChronoUnit.MILLIS) val readTimeoutRestHealthIndicatorInMillis: Duration,
+        @DurationUnit(ChronoUnit.MILLIS) val connectionRestHealthIndicatorTimeoutInMillis: Duration,
+        @DurationUnit(ChronoUnit.MILLIS) val readTimeoutRestTemplateInMillis: Duration,
+        @DurationUnit(ChronoUnit.MILLIS) val connectionRestTemplateTimeoutInMillis: Duration
 )

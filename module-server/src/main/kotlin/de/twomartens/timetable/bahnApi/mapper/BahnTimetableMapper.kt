@@ -1,7 +1,7 @@
 package de.twomartens.timetable.bahnApi.mapper
 
 import de.twomartens.timetable.bahnApi.model.db.BahnTimetable
-import de.twomartens.timetable.model.base.NonEmptyString
+import de.twomartens.timetable.types.NonEmptyString
 import org.mapstruct.*
 import java.time.LocalDateTime
 

@@ -2,7 +2,7 @@ package de.twomartens.timetable.bahnApi.tasks
 
 import de.twomartens.timetable.bahnApi.model.dto.BahnTimetable
 import de.twomartens.timetable.bahnApi.service.BahnDatabaseService
-import de.twomartens.timetable.model.base.HourAtDay
+import de.twomartens.timetable.types.HourAtDay
 import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Async
 

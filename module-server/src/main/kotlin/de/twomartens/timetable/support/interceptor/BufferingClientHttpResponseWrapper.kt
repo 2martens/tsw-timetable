@@ -8,7 +8,7 @@ import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 
-class BufferingClientHttpResponseWrapper(private val response: ClientHttpResponse): ClientHttpResponse {
+class BufferingClientHttpResponseWrapper(private val response: ClientHttpResponse) : ClientHttpResponse {
     private var body: ByteArray? = null
 
     @Throws(IOException::class)

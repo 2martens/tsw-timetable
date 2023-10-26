@@ -5,6 +5,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":common"))
     implementation(libs.mapstruct.base)
     implementation(libs.bundles.spring.boot.security)
     implementation(libs.jaxb.impl)

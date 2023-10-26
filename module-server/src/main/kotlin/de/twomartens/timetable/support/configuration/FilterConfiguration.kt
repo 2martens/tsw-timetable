@@ -6,8 +6,8 @@ import org.springframework.web.filter.ForwardedHeaderFilter
 
 @Configuration
 open class FilterConfiguration {
-  @Bean
-  open fun forwardedFilter(): ForwardedHeaderFilter {
-    return ForwardedHeaderFilter()
-  }
+    @Bean
+    open fun forwardedFilter(): ForwardedHeaderFilter {
+        return ForwardedHeaderFilter()
+    }
 }

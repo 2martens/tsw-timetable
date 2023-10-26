@@ -12,28 +12,28 @@ import org.springframework.context.annotation.Configuration
 
 @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT")
 @SecurityScheme(
-    name = "oauth2",
-    type = SecuritySchemeType.OAUTH2,
-    flows = OAuthFlows(
-        implicit = OAuthFlow(
-            authorizationUrl = "https://id.2martens.de/realms/2martens/protocol/openid-connect/auth",
-            tokenUrl = "https://id.2martens.de/realms/2martens/protocol/openid-connect/token"
+        name = "oauth2",
+        type = SecuritySchemeType.OAUTH2,
+        flows = OAuthFlows(
+                implicit = OAuthFlow(
+                        authorizationUrl = "https://id.2martens.de/realms/2martens/protocol/openid-connect/auth",
+                        tokenUrl = "https://id.2martens.de/realms/2martens/protocol/openid-connect/token"
+                )
         )
-    )
 )
 @Configuration
 open class OpenApiConfiguration {
     @Bean
     open fun customOpenAPI(
-        @Value("\${openapi.description}") apiDescription: String,
-        @Value("\${openapi.version}") apiVersion: String, @Value("\${openapi.title}") apiTitle: String
+            @Value("\${openapi.description}") apiDescription: String,
+            @Value("\${openapi.version}") apiVersion: String, @Value("\${openapi.title}") apiTitle: String
     ): OpenAPI {
         return OpenAPI()
-            .info(
-                Info()
-                    .title(apiTitle)
-                    .version(apiVersion)
-                    .description(apiDescription)
-            )
+                .info(
+                        Info()
+                                .title(apiTitle)
+                                .version(apiVersion)
+                                .description(apiDescription)
+                )
     }
 }

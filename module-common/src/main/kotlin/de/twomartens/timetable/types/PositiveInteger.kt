@@ -1,4 +1,4 @@
-package de.twomartens.timetable.model.base
+package de.twomartens.timetable.types
 
 @JvmInline
 value class PositiveInteger(val value: Int) {

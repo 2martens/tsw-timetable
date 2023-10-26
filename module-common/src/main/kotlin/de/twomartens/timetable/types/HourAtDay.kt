@@ -1,4 +1,4 @@
-package de.twomartens.timetable.model.base
+package de.twomartens.timetable.types
 
 import java.time.LocalDate
 import java.time.LocalDateTime

@@ -1,9 +1,9 @@
 package de.twomartens.timetable.controller
 
 import de.twomartens.timetable.bahnApi.service.ScheduledTaskService
-import de.twomartens.timetable.model.base.NonEmptyString
 import de.twomartens.timetable.model.db.UserId
 import de.twomartens.timetable.repository.TswRouteRepository
+import de.twomartens.timetable.types.NonEmptyString
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse

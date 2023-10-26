@@ -1,8 +1,8 @@
 package de.twomartens.timetable.support.configuration
 
+import de.twomartens.timetable.property.RestTemplateTimeoutProperties
 import de.twomartens.timetable.support.interceptor.HeaderInterceptorRest
 import de.twomartens.timetable.support.interceptor.LoggingInterceptorRest
-import de.twomartens.timetable.property.RestTemplateTimeoutProperties
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,10 +17,10 @@ open class RestTemplateConfiguration {
             restTemplateTimeoutProperties: RestTemplateTimeoutProperties
     ): RestTemplate {
         return RestTemplateBuilder()
-            .additionalInterceptors(headerInterceptorRest, loggingInterceptor)
-            .setConnectTimeout(restTemplateTimeoutProperties.connectionRestTemplateTimeoutInMillis)
-            .setReadTimeout(restTemplateTimeoutProperties.readTimeoutRestTemplateInMillis)
-            .build()
+                .additionalInterceptors(headerInterceptorRest, loggingInterceptor)
+                .setConnectTimeout(restTemplateTimeoutProperties.connectionRestTemplateTimeoutInMillis)
+                .setReadTimeout(restTemplateTimeoutProperties.readTimeoutRestTemplateInMillis)
+                .build()
     }
 
     @Bean("restTemplateRestHealthIndicator")
@@ -29,9 +29,9 @@ open class RestTemplateConfiguration {
             restTemplateTimeoutProperties: RestTemplateTimeoutProperties
     ): RestTemplate {
         return RestTemplateBuilder()
-            .additionalInterceptors(headerInterceptorRest)
-            .setConnectTimeout(restTemplateTimeoutProperties.connectionRestHealthIndicatorTimeoutInMillis)
-            .setReadTimeout(restTemplateTimeoutProperties.readTimeoutRestHealthIndicatorInMillis)
-            .build()
+                .additionalInterceptors(headerInterceptorRest)
+                .setConnectTimeout(restTemplateTimeoutProperties.connectionRestHealthIndicatorTimeoutInMillis)
+                .setReadTimeout(restTemplateTimeoutProperties.readTimeoutRestHealthIndicatorInMillis)
+                .build()
     }
 }

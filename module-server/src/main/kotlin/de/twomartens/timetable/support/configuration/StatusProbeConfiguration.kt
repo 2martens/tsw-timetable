@@ -18,8 +18,8 @@ open class StatusProbeConfiguration(private val clock: Clock) {
     @Bean
     open fun testStatusProbe(statusProbeLogger: StatusProbeLogger): StatusProbe {
         return CountBasedStatusProbe(
-            1,
-            clock, StatusProbeCriticality.K1, "testStatusProbe", statusProbeLogger
+                1,
+                clock, StatusProbeCriticality.K1, "testStatusProbe", statusProbeLogger
         )
     }
 }

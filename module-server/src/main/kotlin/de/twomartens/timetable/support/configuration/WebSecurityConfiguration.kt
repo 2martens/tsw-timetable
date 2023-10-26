@@ -34,12 +34,12 @@ open class WebSecurityConfiguration {
     @Throws(Exception::class)
     open fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .csrf { it.disable() }
-            .authorizeHttpRequests { it.requestMatchers(*PERMITTED_PATHS.toTypedArray<String>()).permitAll() }
-            .authorizeHttpRequests { it.requestMatchers(HttpMethod.OPTIONS).permitAll() }
-            .authorizeHttpRequests { it.anyRequest().authenticated() }
-            .oauth2ResourceServer { obj: OAuth2ResourceServerConfigurer<HttpSecurity?> -> obj.jwt(Customizer.withDefaults()) }
-            .addFilterAfter(createPolicyEnforcerFilter(), BearerTokenAuthenticationFilter::class.java)
+                .csrf { it.disable() }
+                .authorizeHttpRequests { it.requestMatchers(*PERMITTED_PATHS.toTypedArray<String>()).permitAll() }
+                .authorizeHttpRequests { it.requestMatchers(HttpMethod.OPTIONS).permitAll() }
+                .authorizeHttpRequests { it.anyRequest().authenticated() }
+                .oauth2ResourceServer { obj: OAuth2ResourceServerConfigurer<HttpSecurity?> -> obj.jwt(Customizer.withDefaults()) }
+                .addFilterAfter(createPolicyEnforcerFilter(), BearerTokenAuthenticationFilter::class.java)
         return http.build()
     }
 
@@ -53,7 +53,7 @@ open class WebSecurityConfiguration {
             override fun resolve(request: HttpRequest): PolicyEnforcerConfig {
                 return try {
                     val policyEnforcerConfig = JsonSerialization.readValue(
-                        javaClass.getResourceAsStream("/policy-enforcer.json"), PolicyEnforcerConfig::class.java
+                            javaClass.getResourceAsStream("/policy-enforcer.json"), PolicyEnforcerConfig::class.java
                     )
                     policyEnforcerConfig.credentials = mapOf(Pair("secret", clientSecret))
                     if (request.method == HttpMethod.OPTIONS.name()) {
@@ -72,12 +72,12 @@ open class WebSecurityConfiguration {
 
     companion object {
         private val PERMITTED_PATHS: Collection<String> = listOf(
-            "/timetable/v1/healthCheck",
-            "/actuator/**",
-            "/timetable/v1/doc/**",
-            "/timetable/v1/api-docs/**",
-            "/error",
-            "/timetable/version",
+                "/timetable/v1/healthCheck",
+                "/actuator/**",
+                "/timetable/v1/doc/**",
+                "/timetable/v1/api-docs/**",
+                "/error",
+                "/timetable/version",
         )
         private val PATHS = buildPathConfigs()
 

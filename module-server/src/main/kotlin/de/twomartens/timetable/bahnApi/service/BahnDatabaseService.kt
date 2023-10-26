@@ -6,7 +6,7 @@ import de.twomartens.timetable.bahnApi.model.dto.BahnStation
 import de.twomartens.timetable.bahnApi.model.dto.BahnTimetable
 import de.twomartens.timetable.bahnApi.repository.BahnStationRepository
 import de.twomartens.timetable.bahnApi.repository.BahnTimetableRepository
-import de.twomartens.timetable.model.base.HourAtDay
+import de.twomartens.timetable.types.HourAtDay
 import org.mapstruct.factory.Mappers
 import org.springframework.stereotype.Service
 

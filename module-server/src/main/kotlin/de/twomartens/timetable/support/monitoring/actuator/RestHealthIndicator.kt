@@ -1,7 +1,7 @@
 package de.twomartens.timetable.support.monitoring.actuator
 
-import de.twomartens.timetable.support.interceptor.HeaderInterceptorRest
 import de.twomartens.timetable.property.ServiceProperties
+import de.twomartens.timetable.support.interceptor.HeaderInterceptorRest
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.boot.actuate.health.Status

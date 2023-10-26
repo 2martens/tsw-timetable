@@ -8,7 +8,7 @@ import jakarta.xml.bind.annotation.XmlRootElement
 @XmlRootElement(name = "stations")
 @XmlAccessorType(XmlAccessType.FIELD)
 data class BahnStations(
-    @field:XmlElement(name = "station") var stations: List<BahnStation>
+        @field:XmlElement(name = "station") var stations: List<BahnStation>
 ) {
     constructor() : this(listOf())
 }

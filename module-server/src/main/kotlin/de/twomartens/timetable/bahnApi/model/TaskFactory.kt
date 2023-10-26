@@ -1,7 +1,7 @@
 package de.twomartens.timetable.bahnApi.model
 
 import de.twomartens.timetable.bahnApi.model.db.ScheduledFetchTask
-import de.twomartens.timetable.model.base.HourAtDay
+import de.twomartens.timetable.types.HourAtDay
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
