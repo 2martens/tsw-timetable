@@ -13,8 +13,8 @@ import java.time.Instant
 
 @Document
 data class BahnStation(
-        @TextIndexed var name: NonEmptyString,
         @Indexed(unique = true) var eva: Eva,
+        @TextIndexed var name: NonEmptyString,
         var ds100: String,
         var db: Boolean
 ) {
