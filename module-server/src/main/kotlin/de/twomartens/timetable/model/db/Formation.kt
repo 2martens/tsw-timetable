@@ -15,8 +15,10 @@ import java.time.Instant
 @CompoundIndex(def = "{'userId': 1, 'formationId': 1}", unique = true)
 data class Formation(
         var userId: UserId,
-        var positiveInteger: FormationId,
-        var name: NonEmptyString
+        var formationId: FormationId,
+        var name: NonEmptyString,
+        var trainSimWorldFormationId: FormationId,
+        var coaches: List<NonEmptyString>
 ) {
     @Id
     var id: ObjectId = ObjectId()
