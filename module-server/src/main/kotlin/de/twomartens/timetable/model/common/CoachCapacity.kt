@@ -1,4 +1,4 @@
-package de.twomartens.timetable.model.db
+package de.twomartens.timetable.model.common
 
 import de.twomartens.timetable.types.PositiveInteger
 

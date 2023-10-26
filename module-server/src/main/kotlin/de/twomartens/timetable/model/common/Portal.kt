@@ -1,11 +1,10 @@
-package de.twomartens.timetable.model.db
+package de.twomartens.timetable.model.common
 
 import de.twomartens.timetable.types.NonEmptyString
 import kotlin.time.Duration
 
-data class Depot(
+data class Portal(
         var name: NonEmptyString,
         var nearestStationId: StationId,
-        var tracks: Map<TrackId, CoachCapacity>,
         var formationTimes: Map<FormationId, Duration>
 )

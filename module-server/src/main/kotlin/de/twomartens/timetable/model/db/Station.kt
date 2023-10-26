@@ -1,5 +1,7 @@
 package de.twomartens.timetable.model.db
 
+import de.twomartens.timetable.model.common.Platform
+import de.twomartens.timetable.model.common.StationId
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
