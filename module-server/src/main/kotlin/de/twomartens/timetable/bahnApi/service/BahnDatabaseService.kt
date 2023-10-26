@@ -24,6 +24,6 @@ class BahnDatabaseService(
     }
 
     fun storeTimetable(timetable: BahnTimetable, hourAtDay: HourAtDay) {
-        bahnTimetableRepository.save(bahnTimetableMapper.mapToDB(timetable, hourAtDay.dateTime))
+        bahnTimetableRepository.save(bahnTimetableMapper.mapToDB(timetable, hourAtDay))
     }
 }

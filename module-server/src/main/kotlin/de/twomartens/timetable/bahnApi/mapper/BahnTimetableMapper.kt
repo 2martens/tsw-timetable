@@ -1,9 +1,9 @@
 package de.twomartens.timetable.bahnApi.mapper
 
 import de.twomartens.timetable.bahnApi.model.db.BahnTimetable
+import de.twomartens.timetable.types.HourAtDay
 import de.twomartens.timetable.types.NonEmptyString
 import org.mapstruct.*
-import java.time.LocalDateTime
 
 @Mapper(
         collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED,
@@ -15,10 +15,10 @@ interface BahnTimetableMapper {
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastModified", ignore = true)
     fun mapToDB(dto: de.twomartens.timetable.bahnApi.model.dto.BahnTimetable,
-                dateTime: LocalDateTime): BahnTimetable {
+                hourAtDay: HourAtDay): BahnTimetable {
         return BahnTimetable(
                 dto.eva,
-                dateTime,
+                hourAtDay,
                 NonEmptyString(dto.station),
                 dto.stops
         )
