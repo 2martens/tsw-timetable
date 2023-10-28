@@ -27,6 +27,9 @@ spring:
   cloud:
     config:
       name: timetable
+    kubernetes:
+      leader:
+        enabled: true
   main:
     banner-mode: off
   profiles:

@@ -13,5 +13,6 @@ dependencies {
     annotationProcessor(libs.mapstruct.processor)
     kapt(libs.mapstruct.processor)
     implementation(libs.spring.cloud.starter.config)
-//    implementation(libs.spring.cloud.starter.bus.kafka)
+    implementation(libs.spring.cloud.leader.election)
+    implementation(libs.spring.cloud.starter.bus.kafka)
 }

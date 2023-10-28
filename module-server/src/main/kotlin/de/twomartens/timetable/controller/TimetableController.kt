@@ -54,6 +54,6 @@ class TimetableController(
         val route = routeRepository.findByUserIdAndName(userId, routeName)
                 ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Route name must belong to existing route")
-        scheduledTaskService.scheduleTimetableFetch(route, date)
+        scheduledTaskService.triggerTimetableFetch(route, date)
     }
 }

@@ -14,8 +14,7 @@ class TaskFactory {
 
     private val _tasksPerHour: MutableMap<HourAtDay, Int> = mutableMapOf()
 
-    fun initializeWithExistingTasks(existingTasks: List<ScheduledFetchTask>) {
-        resetCounter()
+    fun updateCounterWith(existingTasks: List<ScheduledFetchTask>) {
         countTasks(existingTasks)
     }
 

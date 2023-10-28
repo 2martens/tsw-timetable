@@ -3,6 +3,10 @@ management.server.port: 12101
 
 
 spring:
+  cloud:
+    kubernetes:
+      leader:
+        enabled: false
   config:
     import:
       - "classpath:config/timetable.yaml"

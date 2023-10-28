@@ -1,27 +1,40 @@
 package de.twomartens.timetable
 
-import de.twomartens.timetable.bahnApi.service.ScheduledTaskService
-import mu.KotlinLogging
+import de.twomartens.timetable.support.model.LeadershipStatus
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.runApplication
+import org.springframework.cloud.kubernetes.commons.leader.LeaderProperties
 import org.springframework.context.event.EventListener
 import org.springframework.data.mongodb.config.EnableMongoAuditing
+import org.springframework.integration.leader.event.OnGrantedEvent
+import org.springframework.integration.leader.event.OnRevokedEvent
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @EnableMongoAuditing
 @EnableScheduling
 @SpringBootApplication
 open class MainApplication(
-        private val scheduledTaskService: ScheduledTaskService
+        private val leadershipStatus: LeadershipStatus,
+        private val leaderProperties: LeaderProperties
 ) {
     @EventListener(ApplicationReadyEvent::class)
-    fun ready() {
-        scheduledTaskService.initializeScheduledTasks()
+    fun ready(event: ApplicationReadyEvent) {
+        setInitialLeadershipStatus()
     }
 
-    companion object {
-        private val log = KotlinLogging.logger {}
+    @EventListener(OnGrantedEvent::class)
+    fun onLeadershipGranted(event: OnGrantedEvent) {
+        leadershipStatus.isLeader = true
+    }
+
+    @EventListener(OnRevokedEvent::class)
+    fun onLeadershipRevoked(event: OnRevokedEvent) {
+        leadershipStatus.isLeader = false
+    }
+
+    private fun setInitialLeadershipStatus() {
+        leadershipStatus.isLeader = !leaderProperties.isEnabled
     }
 }
 

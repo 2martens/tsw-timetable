@@ -43,6 +43,7 @@ spring-cloud-starter = { module = "org.springframework.cloud:spring-cloud-starte
 spring-cloud-starter-bus-kafka = { module = "org.springframework.cloud:spring-cloud-starter-bus-kafka" }
 spring-cloud-starter-config = { module = "org.springframework.cloud:spring-cloud-starter-config" }
 spring-cloud-config-server = { module = "org.springframework.cloud:spring-cloud-config-server" }
+spring-cloud-leader-election = { module = "org.springframework.cloud:spring-cloud-kubernetes-fabric8-leader" }
 spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
 spring-grpc = { module = "net.devh:grpc-spring-boot-starter", version.ref = "spring-grpc" }
 spring-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "spring-doc" }
