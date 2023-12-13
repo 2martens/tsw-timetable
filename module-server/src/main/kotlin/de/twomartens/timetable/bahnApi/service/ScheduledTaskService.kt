@@ -27,7 +27,7 @@ class ScheduledTaskService(
         private val leaderProperties: LeaderProperties,
         private val scheduledFetchTaskRepository: ScheduledFetchTaskRepository,
         private val taskFactory: TaskFactory,
-        private val taskScheduler: TaskScheduler
+        private val fetchTaskScheduler: FetchTaskScheduler
 ) {
     private var createdTime: Instant = Instant.EPOCH
     private var lastUpdate: Instant = Instant.EPOCH
@@ -103,7 +103,7 @@ class ScheduledTaskService(
 
     private fun scheduleTasksIfLeader(tasksToSchedule: List<ScheduledFetchTask>) {
         if (leadershipStatus.isLeader) {
-            taskScheduler.scheduleFetchTasks(tasksToSchedule)
+            fetchTaskScheduler.scheduleFetchTasks(tasksToSchedule)
         }
     }
 

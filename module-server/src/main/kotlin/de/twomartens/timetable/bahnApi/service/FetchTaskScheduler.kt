@@ -16,7 +16,7 @@ import java.time.ZonedDateTime
 private const val PAST_TASK_EXECUTION_OFFSET = 1
 
 @Service
-class TaskScheduler(
+class FetchTaskScheduler(
         private val clock: Clock,
         private val threadPoolTaskScheduler: ThreadPoolTaskScheduler,
         private val threadPoolTaskExecutor: ThreadPoolTaskExecutor,
