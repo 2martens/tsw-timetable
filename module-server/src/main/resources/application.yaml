@@ -2,6 +2,8 @@ server:
   port: 12100
   shutdown: graceful
   forward-headers-strategy: framework
+  http2:
+    enabled: true
 
 ### technical configurations ###
 management:
