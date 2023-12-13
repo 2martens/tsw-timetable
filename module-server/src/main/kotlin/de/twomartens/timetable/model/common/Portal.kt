@@ -1,7 +1,7 @@
 package de.twomartens.timetable.model.common
 
 import de.twomartens.timetable.types.NonEmptyString
-import kotlin.time.Duration
+import java.time.Duration
 
 data class Portal(
         var name: NonEmptyString,

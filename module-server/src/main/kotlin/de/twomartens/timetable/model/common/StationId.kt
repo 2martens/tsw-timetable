@@ -2,8 +2,7 @@ package de.twomartens.timetable.model.common
 
 import de.twomartens.timetable.types.NonEmptyString
 
-@JvmInline
-value class StationId private constructor(val value: String) {
+class StationId private constructor(val value: String) {
 
     companion object {
         private val idPattern = Regex("^\\w{2}-(?<countryStationId>\\w.*)")
