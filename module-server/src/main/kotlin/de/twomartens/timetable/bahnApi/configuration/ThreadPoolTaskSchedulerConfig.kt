@@ -13,7 +13,7 @@ open class ThreadPoolTaskSchedulerConfig {
     open fun threadPoolTaskScheduler(): ThreadPoolTaskScheduler {
         val scheduler = ThreadPoolTaskScheduler()
         scheduler.poolSize = POOL_SIZE
-        scheduler.threadNamePrefix = THREAD_NAME_PREFIX
+        scheduler.setThreadNamePrefix(THREAD_NAME_PREFIX)
         return scheduler
     }
 }
