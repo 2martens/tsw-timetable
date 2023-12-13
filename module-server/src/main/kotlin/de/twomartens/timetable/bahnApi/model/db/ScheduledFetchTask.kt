@@ -12,7 +12,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 
 @Document
-@CompoundIndex(def = "{'eva': 1, 'fetchedDateTime': 1", unique = true)
+@CompoundIndex(def = "{'eva': 1, 'fetchedDateTime': 1}", unique = true)
 data class ScheduledFetchTask(
         var eva: Eva,
         var fetchedDateTime: HourAtDay,
