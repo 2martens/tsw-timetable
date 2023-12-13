@@ -1,13 +1,11 @@
 package de.twomartens.timetable.model.common
 
-import de.twomartens.timetable.types.PositiveInteger
+import de.twomartens.timetable.types.NonEmptyString
 
 @JvmInline
-value class FormationId private constructor(val id: Int) {
+value class FormationId private constructor(val id: String) {
     companion object {
-        val EMPTY = FormationId(-1)
-
-        fun of(id: PositiveInteger): FormationId {
+        fun of(id: NonEmptyString): FormationId {
             return FormationId(id.value)
         }
     }

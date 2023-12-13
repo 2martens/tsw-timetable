@@ -3,6 +3,7 @@ package de.twomartens.timetable.model.db
 import de.twomartens.timetable.model.common.FormationId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.types.NonEmptyString
+import de.twomartens.timetable.types.ZeroOrPositiveInteger
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
@@ -17,8 +18,9 @@ data class Formation(
         var userId: UserId,
         var formationId: FormationId,
         var name: NonEmptyString,
-        var trainSimWorldFormationId: FormationId,
-        var coaches: List<NonEmptyString>
+        var trainSimWorldFormationId: FormationId?,
+        var coaches: String,
+        var length: ZeroOrPositiveInteger
 ) {
     @Id
     var id: ObjectId = ObjectId()
