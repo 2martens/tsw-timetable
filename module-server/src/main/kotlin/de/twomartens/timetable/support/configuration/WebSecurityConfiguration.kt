@@ -72,7 +72,7 @@ open class WebSecurityConfiguration {
 
     companion object {
         private val PERMITTED_PATHS: Collection<String> = listOf(
-                "/timetable/v1/healthCheck",
+                "/timetable/healthCheck",
                 "/actuator/**",
                 "/timetable/v1/doc/**",
                 "/timetable/v1/api-docs/**",
