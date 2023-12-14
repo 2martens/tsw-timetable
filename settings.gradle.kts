@@ -4,6 +4,7 @@ rootProject.name = projectname
 include("common")
 include("server")
 include("deploy")
+include("support")
 
 for (subproject in rootProject.children) {
     subproject.projectDir = file("module-" + subproject.name)

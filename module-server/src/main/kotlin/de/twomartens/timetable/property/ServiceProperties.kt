@@ -11,6 +11,5 @@ import org.springframework.cloud.context.config.annotation.RefreshScope
 @ConfigurationProperties(prefix = "de.twomartens.timetable")
 @Schema(description = "Properties, to configure this Application")
 class ServiceProperties {
-    lateinit var greeting: String
     lateinit var countryNames: Map<CountryCode, Map<LanguageCode, NonEmptyString>>
 }
