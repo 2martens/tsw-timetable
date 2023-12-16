@@ -1,4 +1,5 @@
 import org.gradle.accessors.dm.LibrariesForLibs
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ofPattern
@@ -34,13 +35,6 @@ val integrationTestImplementation: Configuration by configurations.getting {
     extendsFrom(configurations.testImplementation.get())
 }
 
-configurations {
-    configureEach {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
-        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
-    }
-}
-
 tasks.register<Test>("integrationTest") {
     systemProperty("junit.jupiter.execution.parallel.enabled", true)
     systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
@@ -73,5 +67,9 @@ tasks.jar {
 
 springBoot {
     buildInfo()
-    mainClass.set("de.twomartens.timetable.MainApplicationKt")
+    mainClass.set(project.properties["mainClass"].toString())
+}
+
+tasks.named<BootJar>("bootJar") {
+    enabled = true
 }
