@@ -6,6 +6,7 @@ import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.Formation
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -23,6 +24,51 @@ class FormationController(
         private val userRepository: UserRepository
 ) {
     private val mapper = Mappers.getMapper(FormationMapper::class.java)
+
+    @Operation(
+            summary = "Access formations of user and filter by name",
+            responses = [ApiResponse(
+                    responseCode = "200",
+                    description = "List of found formations",
+                    content = [Content(
+                            array = ArraySchema(schema = Schema(implementation = Formation::class))
+                    )]
+            ), ApiResponse(
+                    responseCode = "403",
+                    description = "Access forbidden for user",
+                    content = [Content(mediaType = "text/plain")]
+            )]
+    )
+    @GetMapping("/{userId}/")
+    fun getFormations(
+            @PathVariable @Parameter(description = "The id of the user",
+                    example = "1",
+                    required = true) userId: UserId,
+            @RequestParam("name") @Parameter(description = "Searched name",
+                    example = "ICE",
+                    required = false) name: String
+    ): ResponseEntity<List<Formation>> {
+        val userExists = userRepository.existsByUserId(userId)
+        if (!userExists) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        val formations = if (name.isNotBlank()) {
+            formationRepository.findAllByUserIdAndNameContainingIgnoreCase(userId, name)
+        } else {
+            formationRepository.findAllByUserId(userId)
+        }
+
+        val formationsDto = formations.map {
+            val trainSimWorldFormation = if (it.trainSimWorldFormationId != null) {
+                formationRepository.findByUserIdAndFormationId(userId, it.trainSimWorldFormationId!!)
+            } else {
+                null
+            }
+            mapper.mapToDto(it, trainSimWorldFormation)
+        }
+        return ResponseEntity.ok(formationsDto)
+    }
 
     @Operation(
             summary = "Access formation with id belonging to user",

@@ -63,6 +63,8 @@ interface RouteMapper {
         }
     }
 
+    fun mapRoutesToDto(routes: List<de.twomartens.timetable.model.db.TswRoute>): List<TswRoute>
+
     fun mapToDto(db: de.twomartens.timetable.model.db.TswRoute): TswRoute {
         return TswRoute(
                 db.routeId,

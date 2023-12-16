@@ -10,4 +10,6 @@ import org.springframework.data.mongodb.repository.MongoRepository
 interface TswRouteRepository : MongoRepository<TswRoute, ObjectId> {
     fun findByUserIdAndRouteId(userId: UserId, routeId: RouteId): TswRoute?
     fun findByUserIdAndName(userId: UserId, name: NonEmptyString): TswRoute?
+    fun findAllByUserId(userId: UserId): List<TswRoute>
+    fun findAllByUserIdAndNameContainingIgnoreCase(userId: UserId, name: String): List<TswRoute>
 }

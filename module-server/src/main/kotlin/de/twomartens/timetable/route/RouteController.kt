@@ -6,6 +6,7 @@ import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.TswRoute
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -23,6 +24,43 @@ class RouteController(
         private val userRepository: UserRepository
 ) {
     private val mapper = Mappers.getMapper(RouteMapper::class.java)
+
+    @Operation(
+            summary = "Access routes of user and filter by name",
+            responses = [ApiResponse(
+                    responseCode = "200",
+                    description = "List of found routes",
+                    content = [Content(
+                            array = ArraySchema(schema = Schema(implementation = TswRoute::class))
+                    )]
+            ), ApiResponse(
+                    responseCode = "403",
+                    description = "Access forbidden for user",
+                    content = [Content(mediaType = "text/plain")]
+            )]
+    )
+    @GetMapping("/{userId}/")
+    fun getRoutes(
+            @PathVariable @Parameter(description = "The id of the user",
+                    example = "1",
+                    required = true) userId: UserId,
+            @RequestParam("name") @Parameter(description = "Searched name",
+                    example = "1",
+                    required = false) name: String
+    ): ResponseEntity<List<TswRoute>> {
+        val userExists = userRepository.existsByUserId(userId)
+        if (!userExists) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        val routes = if (name.isNotBlank()) {
+            routeRepository.findAllByUserIdAndNameContainingIgnoreCase(userId, name)
+        } else {
+            routeRepository.findAllByUserId(userId)
+        }
+
+        return ResponseEntity.ok(mapper.mapRoutesToDto(routes))
+    }
 
     @Operation(
             summary = "Access route with id belonging to user",
