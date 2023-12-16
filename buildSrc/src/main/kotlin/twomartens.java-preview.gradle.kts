@@ -7,9 +7,9 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 tasks.withType<Test>().configureEach {
-    jvmArgs?.plusAssign("--enable-preview")
+    jvmArgs.plusAssign("--enable-preview")
 }
 
 tasks.withType<JavaExec>().configureEach {
-    jvmArgs?.plusAssign("--enable-preview")
+    jvmArgs.plusAssign("--enable-preview")
 }
