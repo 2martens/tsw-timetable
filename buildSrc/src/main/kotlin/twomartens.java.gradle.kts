@@ -53,8 +53,10 @@ normalization.runtimeClasspath.metaInf {
     ignoreAttribute("Build-Timestamp")
 }
 
+
+
 tasks.register("cleanLibs") {
-    delete("${buildDir}/libs")
+    delete("${layout.buildDirectory.get().asFile}/libs")
 }
 
 tasks.build {
