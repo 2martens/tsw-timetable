@@ -11,11 +11,7 @@ class ScheduledTasksCreatedEvent private constructor(source: Instant, originServ
                                                      destination: Destination)
     : RemoteApplicationEvent(source, originService, destination) {
 
-    private val creationTime: Instant
-
-    init {
-        creationTime = source
-    }
+    private val creationTime: Instant = source
 
     override fun getSource(): Instant {
         return creationTime

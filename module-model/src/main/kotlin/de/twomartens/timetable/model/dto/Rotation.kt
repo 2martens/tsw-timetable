@@ -9,6 +9,5 @@ data class Rotation(
         val formationId: FormationId,
         val firstServiceStartTime: LocalTime,
         val lastServiceEndTime: LocalTime,
-        val startsInVault: Boolean,
-
-        )
+        val startsInVault: Boolean
+)

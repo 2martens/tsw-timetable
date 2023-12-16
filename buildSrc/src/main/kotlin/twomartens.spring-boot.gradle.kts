@@ -4,15 +4,12 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ofPattern
 
 plugins {
-    id("org.springframework.boot")
-    id("twomartens.java")
+    id("twomartens.spring-boot-base")
 }
 
 val libs = the<LibrariesForLibs>()
 
 dependencies {
-    implementation(platform(libs.spring.boot))
-
     implementation(libs.bundles.spring.boot)
     testImplementation(libs.spring.boot.test)
 }
