@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping(value = ["/v1/formation"])
+@RequestMapping(value = ["/v1/formations"])
 @Tag(name = "Formations", description = "all requests relating to formation resources")
 class FormationController(
         private val formationRepository: FormationRepository,
