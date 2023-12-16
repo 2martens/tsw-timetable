@@ -1,6 +1,7 @@
 package de.twomartens.timetable.model.db
 
 import de.twomartens.timetable.model.common.UserId
+import de.twomartens.timetable.types.Email
 import de.twomartens.timetable.types.NonEmptyString
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
@@ -12,7 +13,8 @@ import java.time.Instant
 @Document
 data class User(
         var userId: UserId,
-        var name: NonEmptyString
+        var name: NonEmptyString,
+        var email: Email
 ) {
     @Id
     var id: ObjectId = ObjectId()

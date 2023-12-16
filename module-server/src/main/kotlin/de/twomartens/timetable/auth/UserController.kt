@@ -63,6 +63,7 @@ class UserController(
             user = mapper.mapToDB(body)
         } else {
             user.name = body.name
+            user.email = body.email
         }
 
         userRepository.save(user)
