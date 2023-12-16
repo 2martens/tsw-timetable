@@ -125,4 +125,41 @@ class RouteController(
             ResponseEntity.ok(updatedRoute)
         }
     }
+
+    @Operation(
+            summary = "Delete route with id belonging to user",
+            responses = [ApiResponse(
+                    responseCode = "204",
+                    description = "Route was deleted",
+                    content = [Content(mediaType = "text/plain")]
+            ), ApiResponse(
+                    responseCode = "404",
+                    description = "Route was not found",
+                    content = [Content(mediaType = "text/plain")]
+            ), ApiResponse(
+                    responseCode = "403",
+                    description = "Access forbidden for user",
+                    content = [Content(mediaType = "text/plain")]
+            )]
+    )
+    @DeleteMapping("/{userId}/{id}")
+    fun deleteRoute(
+            @PathVariable @Parameter(description = "The id of the user",
+                    example = "1",
+                    required = true) userId: UserId,
+            @PathVariable @Parameter(description = "The id of the route",
+                    example = "1",
+                    required = true) id: RouteId,
+    ): ResponseEntity<Void> {
+        val userExists = userRepository.existsByUserId(userId)
+        if (!userExists) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        val route = routeRepository.findByUserIdAndRouteId(userId, id)
+                ?: return ResponseEntity.notFound().build()
+        routeRepository.delete(route)
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+    }
 }
