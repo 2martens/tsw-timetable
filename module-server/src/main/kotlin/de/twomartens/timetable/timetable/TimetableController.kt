@@ -1,8 +1,8 @@
-package de.twomartens.timetable.controller
+package de.twomartens.timetable.timetable
 
 import de.twomartens.timetable.bahnApi.service.ScheduledTaskService
 import de.twomartens.timetable.model.common.UserId
-import de.twomartens.timetable.repository.TswRouteRepository
+import de.twomartens.timetable.route.TswRouteRepository
 import de.twomartens.timetable.types.NonEmptyString
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -18,7 +18,7 @@ import java.time.Clock
 import java.time.LocalDate
 
 @RestController
-@RequestMapping(value = ["/timetable/v1"])
+@RequestMapping(value = ["/v1/timetables"])
 @Tag(name = "Timetables", description = "all requests relating to timetables")
 class TimetableController(
         private val clock: Clock,
