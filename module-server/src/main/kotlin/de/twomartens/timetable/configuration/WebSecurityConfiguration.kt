@@ -74,8 +74,8 @@ open class WebSecurityConfiguration {
         private val PERMITTED_PATHS: Collection<String> = listOf(
                 "/timetable/healthCheck",
                 "/actuator/**",
-                "/timetable/v1/doc/**",
-                "/timetable/v1/api-docs/**",
+                "/doc/v1/timetable/**",
+                "/api-docs/v1/timetable/**",
                 "/error",
                 "/timetable/version",
         )

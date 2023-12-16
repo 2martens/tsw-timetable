@@ -52,10 +52,10 @@ springdoc:
     display-request-duration: true
     operationsSorter: method
     disable-swagger-default-url: true
-    path: '/timetable/v1/doc/'
+    path: '/doc/v1/timetable/'
   default-produces-media-type: 'application/json'
   api-docs:
-    path: '/timetable/v1/api-docs'
+    path: '/api-docs/v1/timetable'
 
 openapi:
   description: |
