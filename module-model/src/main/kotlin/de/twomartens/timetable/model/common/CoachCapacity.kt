@@ -1,6 +1,6 @@
 package de.twomartens.timetable.model.common
 
-import de.twomartens.timetable.types.PositiveInteger
+import de.twomartens.timetable.types.ZeroOrPositiveInteger
 
 @JvmInline
-value class CoachCapacity(val capacity: PositiveInteger)
+value class CoachCapacity(val capacity: ZeroOrPositiveInteger)

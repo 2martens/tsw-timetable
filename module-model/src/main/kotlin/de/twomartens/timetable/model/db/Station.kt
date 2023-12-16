@@ -2,6 +2,7 @@ package de.twomartens.timetable.model.db
 
 import de.twomartens.timetable.model.common.Platform
 import de.twomartens.timetable.model.common.StationId
+import de.twomartens.timetable.types.NonEmptyString
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
@@ -13,7 +14,7 @@ import java.time.Instant
 @Document
 data class Station(
         @Indexed(unique = true) var stationId: StationId,
-        var name: String,
+        var name: NonEmptyString,
         var platforms: List<Platform>
 ) {
     @Id

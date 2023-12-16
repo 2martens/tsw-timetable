@@ -81,8 +81,8 @@ class ScheduledTaskService(
             fetchDates: FetchDates
     ): List<ScheduledFetchTask> {
         val newTasks = mutableListOf<ScheduledFetchTask>()
-        tswRoute.stationIds.forEach {
-            val stationId = it
+        tswRoute.stations.forEach {
+            val stationId = it.id
             val eva = Eva.of(stationId)
             var hourAtDay = HourAtDay.of(Hour.of(23), fetchDates.previousDay)
             var newTask = taskFactory.createTaskAndUpdateCounter(eva, hourAtDay)

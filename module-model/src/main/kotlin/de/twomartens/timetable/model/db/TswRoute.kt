@@ -1,6 +1,9 @@
 package de.twomartens.timetable.model.db
 
-import de.twomartens.timetable.model.common.*
+import de.twomartens.timetable.model.common.RouteId
+import de.twomartens.timetable.model.common.UserId
+import de.twomartens.timetable.model.dto.Country
+import de.twomartens.timetable.model.dto.Station
 import de.twomartens.timetable.types.NonEmptyString
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
@@ -14,11 +17,12 @@ import java.time.Instant
 @CompoundIndex(def = "{'userId': 1, 'name': 1}", unique = true)
 data class TswRoute(
         var userId: UserId,
+        var routeId: RouteId,
         var name: NonEmptyString,
-        var countryCode: CountryCode,
-        var stationIds: List<StationId>,
-        var portals: List<Portal>,
-        var depots: List<Depot>
+        var country: Country,
+        var stations: List<Station>,
+        var depots: List<Depot>,
+        var portals: List<Portal>
 ) {
     @Id
     var id: ObjectId = ObjectId()
