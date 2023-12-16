@@ -34,7 +34,11 @@ class FormationController(
                     )]
             ), ApiResponse(
                     responseCode = "404",
-                    description = "UserId or formation were not found",
+                    description = "Formation was not found",
+                    content = [Content(mediaType = "text/plain")]
+            ), ApiResponse(
+                    responseCode = "403",
+                    description = "Access forbidden for user",
                     content = [Content(mediaType = "text/plain")]
             )]
     )
@@ -47,9 +51,19 @@ class FormationController(
                     example = "1",
                     required = true) id: FormationId
     ): ResponseEntity<Formation> {
+        val userExists = userRepository.existsByUserId(userId)
+        if (!userExists) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
         val formation = formationRepository.findByUserIdAndFormationId(userId, id)
                 ?: return ResponseEntity.notFound().build()
-        return ResponseEntity.ok(mapper.mapToDto(formation))
+        val trainSimWorldFormation = if (formation.trainSimWorldFormationId != null) {
+            formationRepository.findByUserIdAndFormationId(userId, formation.trainSimWorldFormationId!!)
+        } else {
+            null
+        }
+        return ResponseEntity.ok(mapper.mapToDto(formation, trainSimWorldFormation))
     }
 
     @Operation(
@@ -94,6 +108,11 @@ class FormationController(
         }
 
         var formation = formationRepository.findByUserIdAndFormationId(userId, id)
+        val trainSimWorldFormation = createOrUpdateTrainSimWorldFormation(userId, body.trainSimWorldFormation)
+        if (trainSimWorldFormation != null) {
+            formationRepository.save(trainSimWorldFormation)
+        }
+
         var created = false
 
         if (formation == null) {
@@ -101,18 +120,40 @@ class FormationController(
             formation = mapper.mapToDB(userId, body)
         } else {
             formation.name = body.name
-            formation.trainSimWorldFormationId = body.trainSimWorldFormationId
-            formation.coaches = body.coaches
+            formation.trainSimWorldFormationId = body.trainSimWorldFormation?.id
+            formation.formation = body.formation
             formation.length = body.length
         }
 
         formationRepository.save(formation)
 
-        val updatedFormation = mapper.mapToDto(formation)
+        val updatedFormation = mapper.mapToDto(formation, trainSimWorldFormation)
         return if (created) {
             ResponseEntity.status(HttpStatus.CREATED).body(updatedFormation)
         } else {
             ResponseEntity.ok(updatedFormation)
         }
+    }
+
+    private fun createOrUpdateTrainSimWorldFormation(
+            userId: UserId,
+            formation: Formation?
+    ): de.twomartens.timetable.model.db.Formation? {
+        if (formation == null) {
+            return null
+        }
+
+        var trainSimWorldFormation = formationRepository.findByUserIdAndFormationId(
+                userId, formation.id)
+        if (trainSimWorldFormation == null) {
+            trainSimWorldFormation = mapper.mapToDB(userId, formation)
+            trainSimWorldFormation.trainSimWorldFormationId = null
+        } else {
+            trainSimWorldFormation.name = formation.name
+            trainSimWorldFormation.trainSimWorldFormationId = null
+            trainSimWorldFormation.formation = formation.formation
+            trainSimWorldFormation.length = formation.length
+        }
+        return trainSimWorldFormation
     }
 }

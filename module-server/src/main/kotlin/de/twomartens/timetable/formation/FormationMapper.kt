@@ -11,12 +11,20 @@ import org.mapstruct.*
 )
 interface FormationMapper {
 
-    fun mapToDto(db: de.twomartens.timetable.model.db.Formation): Formation {
+    fun mapToDto(db: de.twomartens.timetable.model.db.Formation,
+                 trainSimWorldFormation: de.twomartens.timetable.model.db.Formation?): Formation {
+
+        val dtoTrainSimWorldFormation = if (trainSimWorldFormation != null) {
+            mapToDto(trainSimWorldFormation, null)
+        } else {
+            null
+        }
+
         return Formation(
                 db.formationId,
                 db.name,
-                db.trainSimWorldFormationId,
-                db.coaches,
+                dtoTrainSimWorldFormation,
+                db.formation,
                 db.length
         )
     }
@@ -29,8 +37,8 @@ interface FormationMapper {
                 userId,
                 dto.id,
                 dto.name,
-                dto.trainSimWorldFormationId,
-                dto.coaches,
+                dto.trainSimWorldFormation?.id,
+                dto.formation,
                 dto.length
         )
     }

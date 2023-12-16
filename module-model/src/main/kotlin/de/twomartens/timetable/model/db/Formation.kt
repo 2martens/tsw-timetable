@@ -19,7 +19,7 @@ data class Formation(
         var formationId: FormationId,
         var name: NonEmptyString,
         var trainSimWorldFormationId: FormationId?,
-        var coaches: String,
+        var formation: String,
         var length: ZeroOrPositiveInteger
 ) {
     @Id
