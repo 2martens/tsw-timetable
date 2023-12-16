@@ -156,4 +156,41 @@ class FormationController(
         }
         return trainSimWorldFormation
     }
+
+    @Operation(
+            summary = "Delete formation with id belonging to user",
+            responses = [ApiResponse(
+                    responseCode = "204",
+                    description = "Formation was deleted",
+                    content = [Content(mediaType = "text/plain")]
+            ), ApiResponse(
+                    responseCode = "404",
+                    description = "Formation was not found",
+                    content = [Content(mediaType = "text/plain")]
+            ), ApiResponse(
+                    responseCode = "403",
+                    description = "Access forbidden for user",
+                    content = [Content(mediaType = "text/plain")]
+            )]
+    )
+    @DeleteMapping("/{userId}/{id}")
+    fun deleteFormation(
+            @PathVariable @Parameter(description = "The id of the user",
+                    example = "1",
+                    required = true) userId: UserId,
+            @PathVariable @Parameter(description = "The id of the formation",
+                    example = "1",
+                    required = true) id: FormationId,
+    ): ResponseEntity<Void> {
+        val userExists = userRepository.existsByUserId(userId)
+        if (!userExists) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        val formation = formationRepository.findByUserIdAndFormationId(userId, id)
+                ?: return ResponseEntity.notFound().build()
+        formationRepository.delete(formation)
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+    }
 }
