@@ -6,53 +6,46 @@ import de.twomartens.timetable.bahnApi.model.dto.BahnStations
 import de.twomartens.timetable.bahnApi.model.dto.BahnTimetable
 import de.twomartens.timetable.bahnApi.property.BahnApiProperties
 import de.twomartens.timetable.types.HourAtDay
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.RestClient
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Service
 class BahnApiService(
-        private val restTemplate: RestTemplate,
+        private val restClient: RestClient,
         private val properties: BahnApiProperties
 ) {
     fun fetchStations(pattern: String): List<BahnStation> {
-        val requestEntity = buildRequestEntity<BahnStations>()
-        val response = restTemplate.exchange(
-                "https://apis.deutschebahn.com/db-api-marketplace/apis/timetables/v1/station/${pattern}",
-                HttpMethod.GET,
-                requestEntity,
-                BahnStations::class.java
-        )
-        val body = response.body
+        val body = restClient.get()
+                .uri("https://apis.deutschebahn.com/db-api-marketplace/apis/timetables/v1/station/${pattern}")
+                .headers {
+                    it.accept = mutableListOf(MediaType.APPLICATION_XML)
+                    it.contentType = MediaType.APPLICATION_XML
+                    it.set("DB-Client-Id", properties.clientId)
+                    it.set("DB-Api-Key", properties.clientSecret)
+                }
+                .retrieve()
+                .body(BahnStations::class.java)
         return body?.stations ?: listOf()
     }
 
     fun fetchTimetable(eva: Eva, hourAtDay: HourAtDay): BahnTimetable {
-        val requestEntity = buildRequestEntity<BahnTimetable>()
         val dateFormatter = DateTimeFormatter.ofPattern("yyMMdd")
         val timeFormatter = DateTimeFormatter.ofPattern("HH")
         val time = LocalTime.of(hourAtDay.hour.value, 0)
-        val response = restTemplate.exchange(
-                "https://apis.deutschebahn.com/db-api-marketplace/apis/timetables/v1/plan/" +
-                        "${eva}/${hourAtDay.date.format(dateFormatter)}/${time.format(timeFormatter)}",
-                HttpMethod.GET,
-                requestEntity,
-                BahnTimetable::class.java
-        )
-        return response.body!!
-    }
-
-    private fun <T> buildRequestEntity(): HttpEntity<T> {
-        val headers = HttpHeaders()
-        headers.accept = mutableListOf(MediaType.APPLICATION_XML)
-        headers.contentType = MediaType.APPLICATION_XML
-        headers.set("DB-Client-Id", properties.clientId)
-        headers.set("DB-Api-Key", properties.clientSecret)
-        return HttpEntity<T>(headers)
+        val body = restClient.get()
+                .uri("https://apis.deutschebahn.com/db-api-marketplace/apis/timetables/v1/plan/" +
+                        "${eva}/${hourAtDay.date.format(dateFormatter)}/${time.format(timeFormatter)}")
+                .headers {
+                    it.accept = mutableListOf(MediaType.APPLICATION_XML)
+                    it.contentType = MediaType.APPLICATION_XML
+                    it.set("DB-Client-Id", properties.clientId)
+                    it.set("DB-Api-Key", properties.clientSecret)
+                }
+                .retrieve()
+                .body(BahnTimetable::class.java)
+        return body!!
     }
 }
