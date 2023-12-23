@@ -1,6 +1,9 @@
 package de.twomartens.timetable.bahnApi.mapper
 
 import de.twomartens.timetable.bahnApi.model.db.BahnStation
+import de.twomartens.timetable.model.common.CountryCode
+import de.twomartens.timetable.model.common.StationId
+import de.twomartens.timetable.model.db.Station
 import de.twomartens.timetable.types.NonEmptyString
 import org.mapstruct.*
 
@@ -20,6 +23,18 @@ interface BahnStationMapper {
                 NonEmptyString(dto.name),
                 dto.ds100,
                 dto.db
+        )
+    }
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "created", ignore = true)
+    @Mapping(target = "lastModified", ignore = true)
+    fun mapToCommonDB(db: BahnStation, countryCode: String): Station {
+        return Station(
+                StationId.of(NonEmptyString(countryCode + db.eva.value.toString())),
+                CountryCode(NonEmptyString(countryCode)),
+                db.name,
+                listOf()
         )
     }
 }

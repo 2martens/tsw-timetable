@@ -1,4 +1,4 @@
-package de.twomartens.timetable.station
+package de.twomartens.timetable.model.mapper
 
 import de.twomartens.timetable.model.common.CountryCode
 import de.twomartens.timetable.model.dto.Station
