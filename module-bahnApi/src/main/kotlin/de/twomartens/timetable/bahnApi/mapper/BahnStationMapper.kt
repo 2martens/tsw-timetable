@@ -31,7 +31,7 @@ interface BahnStationMapper {
     @Mapping(target = "lastModified", ignore = true)
     fun mapToCommonDB(db: BahnStation, countryCode: String): Station {
         return Station(
-                StationId.of(NonEmptyString(countryCode + db.eva.value.toString())),
+                StationId.of(NonEmptyString(countryCode + "-" + db.eva.value.toString())),
                 CountryCode(NonEmptyString(countryCode)),
                 db.name,
                 listOf()
