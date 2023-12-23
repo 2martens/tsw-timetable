@@ -10,14 +10,22 @@ import org.mapstruct.*
 )
 interface UserMapper {
 
-    @Mapping(source = "userId", target = "userId")
-    @Mapping(source = "name", target = "name")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastModified", ignore = true)
-    fun mapToDB(dto: User): de.twomartens.timetable.model.db.User
+    fun mapToDB(dto: User): de.twomartens.timetable.model.db.User {
+        return de.twomartens.timetable.model.db.User(
+                dto.id,
+                dto.name,
+                dto.email
+        )
+    }
 
-    @Mapping(source = "userId", target = "userId")
-    @Mapping(source = "name", target = "name")
-    fun mapToDto(db: de.twomartens.timetable.model.db.User): User
+    fun mapToDto(db: de.twomartens.timetable.model.db.User): User {
+        return User(
+                db.userId,
+                db.name,
+                db.email
+        )
+    }
 }

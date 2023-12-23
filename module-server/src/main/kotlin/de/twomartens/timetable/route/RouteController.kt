@@ -4,6 +4,7 @@ import de.twomartens.timetable.auth.UserRepository
 import de.twomartens.timetable.model.common.RouteId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.TswRoute
+import de.twomartens.timetable.types.NonEmptyString
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.ArraySchema
@@ -43,20 +44,21 @@ class RouteController(
     fun getRoutes(
             @PathVariable @Parameter(description = "The id of the user",
                     example = "1",
-                    required = true) userId: UserId,
-            @RequestParam("name") @Parameter(description = "Searched name",
+                    required = true) userId: String,
+            @RequestParam(name = "name", required = false) @Parameter(description = "Searched name",
                     example = "1",
-                    required = false) name: String
+                    required = false) name: String?
     ): ResponseEntity<List<TswRoute>> {
-        val userExists = userRepository.existsByUserId(userId)
+        val userIdConverted = UserId.of(NonEmptyString(userId))
+        val userExists = userRepository.existsByUserId(userIdConverted)
         if (!userExists) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
-        val routes = if (name.isNotBlank()) {
-            routeRepository.findAllByUserIdAndNameContainingIgnoreCase(userId, name)
+        val routes = if (!name.isNullOrBlank()) {
+            routeRepository.findAllByUserIdAndNameContainingIgnoreCase(userIdConverted, name)
         } else {
-            routeRepository.findAllByUserId(userId)
+            routeRepository.findAllByUserId(userIdConverted)
         }
 
         return ResponseEntity.ok(mapper.mapRoutesToDto(routes))

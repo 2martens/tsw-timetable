@@ -2,6 +2,7 @@ package de.twomartens.timetable.auth
 
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.User
+import de.twomartens.timetable.types.NonEmptyString
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -43,10 +44,10 @@ class UserController(
             )]
     )
     @PutMapping("/{userId}")
-    fun putFormation(
+    fun putUser(
             @PathVariable @Parameter(description = "The id of the user",
                     example = "1",
-                    required = true) userId: UserId,
+                    required = true) userId: String,
             @RequestBody(required = true) @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     content = [
@@ -57,7 +58,8 @@ class UserController(
     ): ResponseEntity<User> {
         var created = false
 
-        var user = userRepository.findByUserId(userId)
+        val userIdConverted = UserId.of(NonEmptyString(userId))
+        var user = userRepository.findByUserId(userIdConverted)
         if (user == null) {
             created = true
             user = mapper.mapToDB(body)

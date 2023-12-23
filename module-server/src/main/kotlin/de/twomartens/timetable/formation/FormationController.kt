@@ -4,6 +4,7 @@ import de.twomartens.timetable.auth.UserRepository
 import de.twomartens.timetable.model.common.FormationId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.Formation
+import de.twomartens.timetable.types.NonEmptyString
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.ArraySchema
@@ -43,25 +44,26 @@ class FormationController(
     fun getFormations(
             @PathVariable @Parameter(description = "The id of the user",
                     example = "1",
-                    required = true) userId: UserId,
-            @RequestParam("name") @Parameter(description = "Searched name",
+                    required = true) userId: String,
+            @RequestParam(name = "name", required = false) @Parameter(description = "Searched name",
                     example = "ICE",
-                    required = false) name: String
+                    required = false) name: String?
     ): ResponseEntity<List<Formation>> {
-        val userExists = userRepository.existsByUserId(userId)
+        val userIdConverted = UserId.of(NonEmptyString(userId))
+        val userExists = userRepository.existsByUserId(userIdConverted)
         if (!userExists) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
-        val formations = if (name.isNotBlank()) {
-            formationRepository.findAllByUserIdAndNameContainingIgnoreCase(userId, name)
+        val formations = if (!name.isNullOrBlank()) {
+            formationRepository.findAllByUserIdAndNameContainingIgnoreCase(userIdConverted, name)
         } else {
-            formationRepository.findAllByUserId(userId)
+            formationRepository.findAllByUserId(userIdConverted)
         }
 
         val formationsDto = formations.map {
             val trainSimWorldFormation = if (it.trainSimWorldFormationId != null) {
-                formationRepository.findByUserIdAndFormationId(userId, it.trainSimWorldFormationId!!)
+                formationRepository.findByUserIdAndFormationId(userIdConverted, it.trainSimWorldFormationId!!)
             } else {
                 null
             }
