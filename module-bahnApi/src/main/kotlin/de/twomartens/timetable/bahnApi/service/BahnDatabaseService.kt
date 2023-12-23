@@ -10,30 +10,45 @@ import de.twomartens.timetable.model.db.Station
 import de.twomartens.timetable.model.repository.StationRepository
 import de.twomartens.timetable.types.HourAtDay
 import org.mapstruct.factory.Mappers
+import org.springframework.data.mongodb.core.BulkOperations
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Service
 
 @Service
-class BahnDatabaseService(
+open class BahnDatabaseService(
         private val bahnStationRepository: BahnStationRepository,
         private val stationRepository: StationRepository,
-        private val bahnTimetableRepository: BahnTimetableRepository
+        private val bahnTimetableRepository: BahnTimetableRepository,
+        private val mongoTemplate: MongoTemplate
 ) {
     private val bahnStationMapper = Mappers.getMapper(BahnStationMapper::class.java)
     private val bahnTimetableMapper = Mappers.getMapper(BahnTimetableMapper::class.java)
 
     fun storeStations(stations: List<BahnStation>) {
-        val bahnStations = stations.map { bahnStationMapper.mapToDB(it) }
-        bahnStationRepository.deleteAll()
-        bahnStationRepository.saveAll(bahnStations)
 
         val existingStations = stationRepository.findAllByCountryCode(COUNTRY_CODE)
-        val bahnStationMap = bahnStations.associateBy { it.eva.toString() }
         val commonStationMap = existingStations
                 .associateBy { it.stationId.stationIdWithinCountry }
+        val bahnStationMap = stations.asSequence()
+                .map(bahnStationMapper::mapToDB)
+                .associateBy { it.eva.toString() }
 
+        updateBahnStations(bahnStationMap)
         deleteRemovedStations(existingStations, bahnStationMap)
         updateStations(existingStations, bahnStationMap)
-        addNewStations(bahnStations, commonStationMap)
+        addNewStations(bahnStationMap, commonStationMap)
+    }
+
+    private fun updateBahnStations(bahnStationMap: Map<String, de.twomartens.timetable.bahnApi.model.db.BahnStation>) {
+        bahnStationRepository.deleteAll()
+        val bahnStations: List<de.twomartens.timetable.bahnApi.model.db.BahnStation> = buildList {
+            this.addAll(bahnStationMap.values)
+        }
+
+        mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED,
+                de.twomartens.timetable.bahnApi.model.db.BahnStation::class.java)
+                .insert(bahnStations)
+                .execute()
     }
 
     private fun deleteRemovedStations(
@@ -58,13 +73,18 @@ class BahnDatabaseService(
     }
 
     private fun addNewStations(
-            bahnStations: List<de.twomartens.timetable.bahnApi.model.db.BahnStation>,
+            bahnStations: Map<String, de.twomartens.timetable.bahnApi.model.db.BahnStation>,
             commonStationMap: Map<String, Station>
     ) {
-        val newStations = bahnStations.filterNot {
-            commonStationMap.containsKey(it.eva.toString())
-        }.map { bahnStationMapper.mapToCommonDB(it, COUNTRY_CODE) }
-        stationRepository.saveAll(newStations)
+        val newStations = bahnStations.asSequence()
+                .filterNot { commonStationMap.containsKey(it.key) }
+                .map { bahnStationMapper.mapToCommonDB(it.value, COUNTRY_CODE) }
+                .toList()
+
+        mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED,
+                Station::class.java)
+                .insert(newStations)
+                .execute()
     }
 
     fun storeTimetable(timetable: BahnTimetable, hourAtDay: HourAtDay) {
