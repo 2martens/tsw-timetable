@@ -1,6 +1,6 @@
 package de.twomartens.timetable.model.dto
 
 data class Country(
-        val countryCode: String,
+        val code: String,
         val name: String
 )
