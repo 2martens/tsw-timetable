@@ -17,5 +17,6 @@
     </Root>
     <Logger additivity="true" level="INFO" name="statusprobe"/>
     <Logger additivity="true" level="DEBUG" name="de.twomartens.timetable"/>
+    <Logger additivity="true" level="DEBUG" name="org.springframework.web.method.HandlerMethod"/>
   </Loggers>
 </Configuration>
