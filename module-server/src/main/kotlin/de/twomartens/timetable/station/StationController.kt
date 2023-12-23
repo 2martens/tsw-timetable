@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.mapstruct.factory.Mappers
 import org.springframework.http.ResponseEntity
@@ -40,6 +41,8 @@ class StationController(
                     content = [Content(mediaType = "text/plain")]
             )]
     )
+    @SecurityRequirement(name = "bearer")
+    @SecurityRequirement(name = "oauth2")
     @GetMapping("/")
     fun getStations(
             @RequestParam(name = "country", required = false) @Parameter(description = "Searched country",
@@ -82,6 +85,8 @@ class StationController(
                     content = [Content(mediaType = "text/plain")]
             )]
     )
+    @SecurityRequirement(name = "bearer")
+    @SecurityRequirement(name = "oauth2")
     @PostMapping("/update")
     fun updateStations(): ResponseEntity<Void> {
         val stations = bahnApiService.fetchStations("")

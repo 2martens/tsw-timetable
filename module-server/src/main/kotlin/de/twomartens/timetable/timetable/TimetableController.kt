@@ -7,6 +7,7 @@ import de.twomartens.timetable.types.NonEmptyString
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PathVariable
@@ -35,6 +36,8 @@ class TimetableController(
                     description = "Request does not follow specification"
             )]
     )
+    @SecurityRequirement(name = "bearer")
+    @SecurityRequirement(name = "oauth2")
     @PostMapping("/{userId}/{routeName}/fetchTimetable/{date}")
     fun scheduleFetch(
             @PathVariable @Parameter(description = "The id of the user",

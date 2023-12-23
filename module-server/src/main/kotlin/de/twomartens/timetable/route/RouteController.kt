@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.mapstruct.factory.Mappers
 import org.springframework.http.HttpStatus
@@ -40,6 +41,8 @@ class RouteController(
                     content = [Content(mediaType = "text/plain")]
             )]
     )
+    @SecurityRequirement(name = "bearer")
+    @SecurityRequirement(name = "oauth2")
     @GetMapping("/{userId}/")
     fun getRoutes(
             @PathVariable @Parameter(description = "The id of the user",
@@ -82,6 +85,8 @@ class RouteController(
                     content = [Content(mediaType = "text/plain")]
             )]
     )
+    @SecurityRequirement(name = "bearer")
+    @SecurityRequirement(name = "oauth2")
     @GetMapping("/{userId}/{id}")
     fun getRoute(
             @PathVariable @Parameter(description = "The id of the user",
@@ -121,6 +126,8 @@ class RouteController(
                     content = [Content(mediaType = "text/plain")]
             )]
     )
+    @SecurityRequirement(name = "bearer")
+    @SecurityRequirement(name = "oauth2")
     @PutMapping("/{userId}/{id}")
     fun putRoute(
             @PathVariable @Parameter(description = "The id of the user",
@@ -182,6 +189,8 @@ class RouteController(
                     content = [Content(mediaType = "text/plain")]
             )]
     )
+    @SecurityRequirement(name = "bearer")
+    @SecurityRequirement(name = "oauth2")
     @DeleteMapping("/{userId}/{id}")
     fun deleteRoute(
             @PathVariable @Parameter(description = "The id of the user",
