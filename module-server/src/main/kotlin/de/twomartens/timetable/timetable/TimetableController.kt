@@ -1,19 +1,24 @@
 package de.twomartens.timetable.timetable
 
+import de.twomartens.timetable.auth.UserRepository
 import de.twomartens.timetable.bahnApi.service.ScheduledTaskService
+import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.common.UserId
+import de.twomartens.timetable.model.dto.Timetable
 import de.twomartens.timetable.route.TswRouteRepository
 import de.twomartens.timetable.types.NonEmptyString
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.mapstruct.factory.Mappers
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.time.Clock
 import java.time.LocalDate
@@ -24,8 +29,92 @@ import java.time.LocalDate
 class TimetableController(
         private val clock: Clock,
         private val routeRepository: TswRouteRepository,
+        private val timetableRepository: TimetableRepository,
+        private val userRepository: UserRepository,
         private val scheduledTaskService: ScheduledTaskService
 ) {
+
+    private val mapper = Mappers.getMapper(TimetableMapper::class.java)
+
+    @Operation(
+            summary = "Access timetables of user and filter by name",
+            responses = [ApiResponse(
+                    responseCode = "200",
+                    description = "List of found timetables",
+                    content = [Content(
+                            array = ArraySchema(schema = Schema(implementation = Timetable::class))
+                    )]
+            ), ApiResponse(
+                    responseCode = "403",
+                    description = "Access forbidden for user",
+                    content = [Content(mediaType = "text/plain")]
+            )]
+    )
+    @SecurityRequirement(name = "bearer")
+    @SecurityRequirement(name = "oauth2")
+    @GetMapping("/{userId}/")
+    fun getTimetables(
+            @PathVariable @Parameter(description = "The id of the user",
+                    example = "1",
+                    required = true) userId: String,
+            @RequestParam(name = "name", required = false) @Parameter(description = "Searched name",
+                    example = "KAH",
+                    required = false) name: String?
+    ): ResponseEntity<List<Timetable>> {
+        val userIdConverted = UserId.of(NonEmptyString(userId))
+        val userExists = userRepository.existsByUserId(userIdConverted)
+        if (!userExists) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        val timetables = if (!name.isNullOrBlank()) {
+            timetableRepository.findAllByUserIdAndNameContainingIgnoreCase(userIdConverted, name)
+        } else {
+            timetableRepository.findAllByUserId(userIdConverted)
+        }
+
+        return ResponseEntity.ok(mapper.mapTimetablesToDto(timetables))
+    }
+
+    @Operation(
+            summary = "Access timetable with id belonging to user",
+            responses = [ApiResponse(
+                    responseCode = "200",
+                    description = "Timetable exists and was returned",
+                    content = [Content(
+                            schema = Schema(implementation = Timetable::class)
+                    )]
+            ), ApiResponse(
+                    responseCode = "404",
+                    description = "Timetable was not found",
+                    content = [Content(mediaType = "text/plain")]
+            ), ApiResponse(
+                    responseCode = "403",
+                    description = "Access forbidden for user",
+                    content = [Content(mediaType = "text/plain")]
+            )]
+    )
+    @SecurityRequirement(name = "bearer")
+    @SecurityRequirement(name = "oauth2")
+    @GetMapping("/{userId}/{id}")
+    fun getTimetable(
+            @PathVariable @Parameter(description = "The id of the user",
+                    example = "1",
+                    required = true) userId: UserId,
+            @PathVariable @Parameter(description = "The id of the timetable",
+                    example = "1",
+                    required = true) id: TimetableId
+    ): ResponseEntity<Timetable> {
+        val userExists = userRepository.existsByUserId(userId)
+        if (!userExists) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        val timetable = timetableRepository.findByUserIdAndTimetableId(userId, id)
+                ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(mapper.mapToDto(timetable))
+    }
+
     @Operation(
             summary = "Task the backend with fetching a timetable for specified route and date",
             responses = [ApiResponse(

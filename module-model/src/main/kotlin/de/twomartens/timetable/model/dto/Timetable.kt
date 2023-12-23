@@ -1,13 +1,12 @@
 package de.twomartens.timetable.model.dto
 
-import de.twomartens.timetable.types.NonEmptyString
 import java.time.LocalDate
 
 data class Timetable(
-        val name: NonEmptyString,
-        val country: Country,
-        val routeName: NonEmptyString,
-        val fetchDate: LocalDate,
+        val id: String,
+        val name: String,
+        val routeId: String,
+        val date: LocalDate,
         val state: TimetableState,
-        val numberOfServices: String
+        val numberOfServices: Int
 )
