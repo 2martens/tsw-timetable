@@ -100,20 +100,22 @@ class FormationController(
     fun getFormation(
             @PathVariable @Parameter(description = "The id of the user",
                     example = "1",
-                    required = true) userId: UserId,
+                    required = true) userId: String,
             @PathVariable @Parameter(description = "The id of the formation",
                     example = "1",
-                    required = true) id: FormationId
+                    required = true) id: String
     ): ResponseEntity<Formation> {
-        val userExists = userRepository.existsByUserId(userId)
+        val userIdConverted = UserId.of(NonEmptyString(userId))
+        val formationIdConverted = FormationId.of(NonEmptyString(id))
+        val userExists = userRepository.existsByUserId(userIdConverted)
         if (!userExists) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
-        val formation = formationRepository.findByUserIdAndFormationId(userId, id)
+        val formation = formationRepository.findByUserIdAndFormationId(userIdConverted, formationIdConverted)
                 ?: return ResponseEntity.notFound().build()
         val trainSimWorldFormation = if (formation.trainSimWorldFormationId != null) {
-            formationRepository.findByUserIdAndFormationId(userId, formation.trainSimWorldFormationId!!)
+            formationRepository.findByUserIdAndFormationId(userIdConverted, formation.trainSimWorldFormationId!!)
         } else {
             null
         }
@@ -146,10 +148,10 @@ class FormationController(
     fun putFormation(
             @PathVariable @Parameter(description = "The id of the user",
                     example = "1",
-                    required = true) userId: UserId,
+                    required = true) userId: String,
             @PathVariable @Parameter(description = "The id of the formation",
                     example = "1",
-                    required = true) id: FormationId,
+                    required = true) id: String,
             @RequestBody(required = true) @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     content = [
@@ -158,13 +160,15 @@ class FormationController(
                         )
                     ]) body: Formation
     ): ResponseEntity<Formation> {
-        val userExists = userRepository.existsByUserId(userId)
+        val userIdConverted = UserId.of(NonEmptyString(userId))
+        val formationIdConverted = FormationId.of(NonEmptyString(id))
+        val userExists = userRepository.existsByUserId(userIdConverted)
         if (!userExists) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
-        var formation = formationRepository.findByUserIdAndFormationId(userId, id)
-        val trainSimWorldFormation = createOrUpdateTrainSimWorldFormation(userId, body.trainSimWorldFormation)
+        var formation = formationRepository.findByUserIdAndFormationId(userIdConverted, formationIdConverted)
+        val trainSimWorldFormation = createOrUpdateTrainSimWorldFormation(userIdConverted, body.trainSimWorldFormation)
         if (trainSimWorldFormation != null) {
             formationRepository.save(trainSimWorldFormation)
         }
@@ -173,7 +177,7 @@ class FormationController(
 
         if (formation == null) {
             created = true
-            formation = mapper.mapToDB(userId, body)
+            formation = mapper.mapToDB(userIdConverted, body)
         } else {
             formation.name = NonEmptyString(body.name)
             formation.trainSimWorldFormationId = if (body.trainSimWorldFormation != null)
