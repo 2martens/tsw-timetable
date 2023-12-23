@@ -91,17 +91,19 @@ class RouteController(
     fun getRoute(
             @PathVariable @Parameter(description = "The id of the user",
                     example = "1",
-                    required = true) userId: UserId,
+                    required = true) userId: String,
             @PathVariable @Parameter(description = "The id of the route",
                     example = "1",
-                    required = true) id: RouteId
+                    required = true) id: String
     ): ResponseEntity<TswRoute> {
-        val userExists = userRepository.existsByUserId(userId)
+        val userIdConverted = UserId.of(NonEmptyString(userId))
+        val routeIdConverted = RouteId.of(NonEmptyString(id))
+        val userExists = userRepository.existsByUserId(userIdConverted)
         if (!userExists) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
-        val route = routeRepository.findByUserIdAndRouteId(userId, id)
+        val route = routeRepository.findByUserIdAndRouteId(userIdConverted, routeIdConverted)
                 ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(mapper.mapToDto(route))
     }
@@ -132,10 +134,10 @@ class RouteController(
     fun putRoute(
             @PathVariable @Parameter(description = "The id of the user",
                     example = "1",
-                    required = true) userId: UserId,
+                    required = true) userId: String,
             @PathVariable @Parameter(description = "The id of the route",
                     example = "1",
-                    required = true) id: RouteId,
+                    required = true) id: String,
             @RequestBody(required = true) @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     content = [
@@ -144,17 +146,19 @@ class RouteController(
                         )
                     ]) body: TswRoute
     ): ResponseEntity<TswRoute> {
-        val userExists = userRepository.existsByUserId(userId)
+        val userIdConverted = UserId.of(NonEmptyString(userId))
+        val routeIdConverted = RouteId.of(NonEmptyString(id))
+        val userExists = userRepository.existsByUserId(userIdConverted)
         if (!userExists) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
-        var route = routeRepository.findByUserIdAndRouteId(userId, id)
+        var route = routeRepository.findByUserIdAndRouteId(userIdConverted, routeIdConverted)
         var created = false
 
         if (route == null) {
             created = true
-            route = mapper.mapToDB(userId, body)
+            route = mapper.mapToDB(userIdConverted, body)
         } else {
             route.name = NonEmptyString(body.name)
             route.country = body.country
