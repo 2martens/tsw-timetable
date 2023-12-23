@@ -1,7 +1,9 @@
 package de.twomartens.timetable.model.mapper
 
 import de.twomartens.timetable.model.common.CountryCode
+import de.twomartens.timetable.model.common.StationId
 import de.twomartens.timetable.model.dto.Station
+import de.twomartens.timetable.types.NonEmptyString
 import org.mapstruct.*
 
 @Mapper(
@@ -15,9 +17,9 @@ interface StationMapper {
     @Mapping(target = "lastModified", ignore = true)
     fun mapToDB(countryCode: CountryCode, dto: Station): de.twomartens.timetable.model.db.Station {
         return de.twomartens.timetable.model.db.Station(
-                dto.id,
+                StationId.of(NonEmptyString(countryCode.countryCode.value + "-" + dto.id)),
                 countryCode,
-                dto.name,
+                NonEmptyString(dto.name),
                 dto.platforms
         )
     }
@@ -26,8 +28,8 @@ interface StationMapper {
 
     fun mapToDto(db: de.twomartens.timetable.model.db.Station): Station {
         return Station(
-                db.stationId,
-                db.name,
+                db.stationId.stationIdWithinCountry,
+                db.name.value,
                 db.platforms
         )
     }

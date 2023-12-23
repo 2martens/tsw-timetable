@@ -156,7 +156,7 @@ class RouteController(
             created = true
             route = mapper.mapToDB(userId, body)
         } else {
-            route.name = body.name
+            route.name = NonEmptyString(body.name)
             route.country = body.country
             route.stations = body.stations
             route.depots = mapper.mapDepotsToDB(body.depots)

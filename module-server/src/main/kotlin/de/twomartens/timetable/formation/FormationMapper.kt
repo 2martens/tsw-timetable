@@ -1,7 +1,10 @@
 package de.twomartens.timetable.formation
 
+import de.twomartens.timetable.model.common.FormationId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.Formation
+import de.twomartens.timetable.types.NonEmptyString
+import de.twomartens.timetable.types.ZeroOrPositiveInteger
 import org.mapstruct.*
 
 @Mapper(
@@ -21,11 +24,11 @@ interface FormationMapper {
         }
 
         return Formation(
-                db.formationId,
-                db.name,
+                db.formationId.id,
+                db.name.value,
                 dtoTrainSimWorldFormation,
                 db.formation,
-                db.length
+                db.length.value
         )
     }
 
@@ -35,11 +38,12 @@ interface FormationMapper {
     fun mapToDB(userId: UserId, dto: Formation): de.twomartens.timetable.model.db.Formation {
         return de.twomartens.timetable.model.db.Formation(
                 userId,
-                dto.id,
-                dto.name,
-                dto.trainSimWorldFormation?.id,
+                FormationId.of(NonEmptyString(dto.id)),
+                NonEmptyString(dto.name),
+                if (dto.trainSimWorldFormation != null)
+                    FormationId.of(NonEmptyString(dto.trainSimWorldFormation!!.id)) else null,
                 dto.formation,
-                dto.length
+                ZeroOrPositiveInteger(dto.length)
         )
     }
 }

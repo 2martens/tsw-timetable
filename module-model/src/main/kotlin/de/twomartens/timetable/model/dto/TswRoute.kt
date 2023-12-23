@@ -1,17 +1,13 @@
 package de.twomartens.timetable.model.dto
 
-import de.twomartens.timetable.model.common.RouteId
-import de.twomartens.timetable.types.NonEmptyString
-import de.twomartens.timetable.types.ZeroOrPositiveInteger
-
 data class TswRoute(
-        val id: RouteId,
-        val name: NonEmptyString,
+        val id: String,
+        val name: String,
         val country: Country,
         val stations: List<Station>,
         val firstStation: Station,
         val lastStation: Station,
-        val numberOfStations: ZeroOrPositiveInteger,
+        val numberOfStations: Int,
         val depots: List<Depot>,
         val portals: List<Portal>
 )

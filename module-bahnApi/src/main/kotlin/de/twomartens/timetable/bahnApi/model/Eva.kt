@@ -1,7 +1,5 @@
 package de.twomartens.timetable.bahnApi.model
 
-import de.twomartens.timetable.model.common.StationId
-
 @JvmInline
 value class Eva(val value: Int) {
     init {
@@ -17,8 +15,8 @@ value class Eva(val value: Int) {
     companion object {
         val UNKNOWN = Eva(-1)
 
-        fun of(stationId: StationId): Eva {
-            return Eva(stationId.stationIdWithinCountry.toInt())
+        fun of(stationId: String): Eva {
+            return Eva(stationId.toInt())
         }
     }
 }

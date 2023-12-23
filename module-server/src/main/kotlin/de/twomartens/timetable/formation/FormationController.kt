@@ -5,6 +5,7 @@ import de.twomartens.timetable.model.common.FormationId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.Formation
 import de.twomartens.timetable.types.NonEmptyString
+import de.twomartens.timetable.types.ZeroOrPositiveInteger
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.ArraySchema
@@ -174,10 +175,11 @@ class FormationController(
             created = true
             formation = mapper.mapToDB(userId, body)
         } else {
-            formation.name = body.name
-            formation.trainSimWorldFormationId = body.trainSimWorldFormation?.id
+            formation.name = NonEmptyString(body.name)
+            formation.trainSimWorldFormationId = if (body.trainSimWorldFormation != null)
+                FormationId.of(NonEmptyString(body.trainSimWorldFormation!!.id)) else null
             formation.formation = body.formation
-            formation.length = body.length
+            formation.length = ZeroOrPositiveInteger(body.length)
         }
 
         formationRepository.save(formation)
@@ -199,15 +201,15 @@ class FormationController(
         }
 
         var trainSimWorldFormation = formationRepository.findByUserIdAndFormationId(
-                userId, formation.id)
+                userId, FormationId.of(NonEmptyString(formation.id)))
         if (trainSimWorldFormation == null) {
             trainSimWorldFormation = mapper.mapToDB(userId, formation)
             trainSimWorldFormation.trainSimWorldFormationId = null
         } else {
-            trainSimWorldFormation.name = formation.name
+            trainSimWorldFormation.name = NonEmptyString(formation.name)
             trainSimWorldFormation.trainSimWorldFormationId = null
             trainSimWorldFormation.formation = formation.formation
-            trainSimWorldFormation.length = formation.length
+            trainSimWorldFormation.length = ZeroOrPositiveInteger(formation.length)
         }
         return trainSimWorldFormation
     }

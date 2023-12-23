@@ -2,6 +2,7 @@ package de.twomartens.timetable.auth
 
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.User
+import de.twomartens.timetable.types.Email
 import de.twomartens.timetable.types.NonEmptyString
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -67,8 +68,8 @@ class UserController(
             created = true
             user = mapper.mapToDB(body)
         } else {
-            user.name = body.name
-            user.email = body.email
+            user.name = NonEmptyString(body.name)
+            user.email = Email.of(NonEmptyString(body.email))
         }
 
         userRepository.save(user)
