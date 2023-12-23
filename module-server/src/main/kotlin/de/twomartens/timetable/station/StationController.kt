@@ -89,7 +89,7 @@ class StationController(
     @SecurityRequirement(name = "oauth2")
     @PostMapping("/update")
     fun updateStations(): ResponseEntity<Void> {
-        val stations = bahnApiService.fetchStations("")
+        val stations = bahnApiService.fetchStations("*")
         bahnDatabaseService.storeStations(stations)
 
         return ResponseEntity.ok().build()
