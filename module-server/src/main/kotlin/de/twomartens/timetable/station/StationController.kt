@@ -49,7 +49,7 @@ class StationController(
                     example = "de",
                     required = false) countryCode: String?,
             @RequestParam(name = "name", required = false) @Parameter(description = "Searched name",
-                    example = "1",
+                    example = "Aachen",
                     required = false) name: String?
     ): ResponseEntity<List<Station>> {
         val stations = findStations(countryCode, name)
