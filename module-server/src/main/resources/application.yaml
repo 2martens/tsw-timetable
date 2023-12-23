@@ -84,6 +84,7 @@ de.twomartens.timetable:
   bahn-api:
     client-id: ${DB_CLIENT_ID}
     client-secret: ${DB_CLIENT_SECRET}
+de.twomartens.support.health.greeting: "Good morning"
 
 time:
   defaultTimeZone: Europe/Berlin
