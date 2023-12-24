@@ -10,11 +10,14 @@ import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 import java.time.LocalDate
 
 @Document
+@CompoundIndex(def = "{userId: 1, timetableId: 1}", unique = true)
+@CompoundIndex(def = "{userId: 1, routeId: 1}")
 data class Timetable(
         var userId: UserId,
         var routeId: RouteId,
