@@ -11,12 +11,14 @@ interface StationRepository : MongoRepository<Station, ObjectId> {
     fun findAllByCountryCode(countryCode: String): List<Station>
 
     @Aggregation(pipeline = [
-        "{\$search: { index: \"stations\",compound: {must: [{phrase: {query: ?0, path: \"countryCode\"}},{autocomplete: {query: ?1,path: \"name\",tokenOrder: \"sequential\"}}]}}}"
+        "{\$search: { index: \"stations\",compound: {must: [{phrase: {query: ?0, path: \"countryCode\"}},{autocomplete: {query: ?1,path: \"name\",tokenOrder: \"sequential\"}}]}}}",
+        "{\$limit: 10}"
     ])
     fun findAllByCountryCodeAndNameContainingIgnoreCase(countryCode: String, name: String): List<Station>
 
     @Aggregation(pipeline = [
-        "{\$search: { index: \"stations\",autocomplete: {query: ?0, path: \"name\",tokenOrder: \"sequential\"}}}"
+        "{\$search: { index: \"stations\",autocomplete: {query: ?0, path: \"name\",tokenOrder: \"sequential\"}}}",
+        "{\$limit: 10}"
     ])
     fun findAllByNameContainingIgnoreCase(name: String): List<Station>
 }
