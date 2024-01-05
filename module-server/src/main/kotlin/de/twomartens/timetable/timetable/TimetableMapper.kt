@@ -21,6 +21,7 @@ interface TimetableMapper {
         return de.twomartens.timetable.model.db.Timetable(
                 userId,
                 RouteId.of(NonEmptyString(dto.routeId)),
+                dto.routeName,
                 TimetableId.of(NonEmptyString(dto.id)),
                 NonEmptyString(dto.name),
                 dto.date,
@@ -36,6 +37,7 @@ interface TimetableMapper {
                 db.timetableId.value,
                 db.name.value,
                 db.routeId.id,
+                db.routeName,
                 db.fetchDate,
                 db.timetableState,
                 db.numberOfServices.value

@@ -5,6 +5,7 @@ import de.twomartens.timetable.bahnApi.service.ScheduledTaskService
 import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.Timetable
+import de.twomartens.timetable.model.dto.TimetableState
 import de.twomartens.timetable.route.TswRouteRepository
 import de.twomartens.timetable.types.NonEmptyString
 import io.swagger.v3.oas.annotations.Operation
@@ -113,6 +114,113 @@ class TimetableController(
         val timetable = timetableRepository.findByUserIdAndTimetableId(userId, id)
                 ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(mapper.mapToDto(timetable))
+    }
+
+    @Operation(
+            summary = "Store timetable with id belonging to user",
+            responses = [ApiResponse(
+                    responseCode = "200",
+                    description = "Timetable was updated",
+                    content = [Content(
+                            schema = Schema(implementation = Timetable::class)
+                    )]
+            ), ApiResponse(
+                    responseCode = "201",
+                    description = "Timetable was created",
+                    content = [Content(
+                            schema = Schema(implementation = Timetable::class)
+                    )]
+            ), ApiResponse(
+                    responseCode = "403",
+                    description = "Access forbidden for user",
+                    content = [Content(mediaType = "text/plain")]
+            )]
+    )
+    @SecurityRequirement(name = "bearer")
+    @SecurityRequirement(name = "oauth2")
+    @PutMapping("/{userId}/{id}")
+    fun putTimetable(
+            @PathVariable @Parameter(description = "The id of the user",
+                    example = "1",
+                    required = true) userId: String,
+            @PathVariable @Parameter(description = "The id of the timetable",
+                    example = "1",
+                    required = true) id: String,
+            @RequestBody(required = true) @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = [
+                        Content(
+                                schema = Schema(implementation = Timetable::class)
+                        )
+                    ]) body: Timetable
+    ): ResponseEntity<Timetable> {
+        val userIdConverted = UserId.of(NonEmptyString(userId))
+        val timetableIdConverted = TimetableId.of(NonEmptyString(id))
+        val userExists = userRepository.existsByUserId(userIdConverted)
+        if (!userExists) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        var timetable = timetableRepository.findByUserIdAndTimetableId(userIdConverted, timetableIdConverted)
+        var created = false
+
+        if (timetable == null) {
+            created = true
+            timetable = mapper.mapToDB(userIdConverted, body)
+            timetable.timetableState = TimetableState.PROCESSING
+        } else {
+            timetable.name = NonEmptyString(body.name)
+        }
+
+        timetableRepository.save(timetable)
+
+        val updatedTimetable = mapper.mapToDto(timetable)
+        return if (created) {
+            ResponseEntity.status(HttpStatus.CREATED).body(updatedTimetable)
+        } else {
+            ResponseEntity.ok(updatedTimetable)
+        }
+    }
+
+    @Operation(
+            summary = "Delete timetable with id belonging to user",
+            responses = [ApiResponse(
+                    responseCode = "204",
+                    description = "Timetable was deleted",
+                    content = [Content(mediaType = "text/plain")]
+            ), ApiResponse(
+                    responseCode = "404",
+                    description = "Timetable was not found",
+                    content = [Content(mediaType = "text/plain")]
+            ), ApiResponse(
+                    responseCode = "403",
+                    description = "Access forbidden for user",
+                    content = [Content(mediaType = "text/plain")]
+            )]
+    )
+    @SecurityRequirement(name = "bearer")
+    @SecurityRequirement(name = "oauth2")
+    @DeleteMapping("/{userId}/{id}")
+    fun deleteTimetable(
+            @PathVariable @Parameter(description = "The id of the user",
+                    example = "1",
+                    required = true) userId: String,
+            @PathVariable @Parameter(description = "The id of the timetable",
+                    example = "1",
+                    required = true) id: String,
+    ): ResponseEntity<Void> {
+        val userIdConverted = UserId.of(NonEmptyString(userId))
+        val timetableIdConverted = TimetableId.of(NonEmptyString(id))
+        val userExists = userRepository.existsByUserId(userIdConverted)
+        if (!userExists) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        val timetable = timetableRepository.findByUserIdAndTimetableId(userIdConverted, timetableIdConverted)
+                ?: return ResponseEntity.notFound().build()
+        timetableRepository.delete(timetable)
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
     @Operation(

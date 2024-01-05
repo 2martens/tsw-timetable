@@ -21,6 +21,7 @@ import java.time.LocalDate
 data class Timetable(
         var userId: UserId,
         var routeId: RouteId,
+        var routeName: String,
         var timetableId: TimetableId,
         var name: NonEmptyString,
         var fetchDate: LocalDate,
