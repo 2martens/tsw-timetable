@@ -17,7 +17,8 @@ open class WebConfiguration(private val headerInterceptorRest: HeaderInterceptor
         val registration = registry.addMapping("/**")
         registration.allowedMethods(
                 HttpMethod.GET.name(), HttpMethod.POST.name(),
-                HttpMethod.PUT.name(), HttpMethod.HEAD.name()
+                HttpMethod.PUT.name(), HttpMethod.HEAD.name(),
+                HttpMethod.DELETE.name()
         )
         registration.allowCredentials(true)
         registration.allowedOrigins(
