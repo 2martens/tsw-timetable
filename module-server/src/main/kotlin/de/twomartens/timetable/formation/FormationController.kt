@@ -240,17 +240,19 @@ class FormationController(
     fun deleteFormation(
             @PathVariable @Parameter(description = "The id of the user",
                     example = "1",
-                    required = true) userId: UserId,
+                    required = true) userId: String,
             @PathVariable @Parameter(description = "The id of the formation",
                     example = "1",
-                    required = true) id: FormationId,
+                    required = true) id: String,
     ): ResponseEntity<Void> {
-        val userExists = userRepository.existsByUserId(userId)
+        val userIdConverted = UserId.of(NonEmptyString(userId))
+        val formationIdConverted = FormationId.of(NonEmptyString(id))
+        val userExists = userRepository.existsByUserId(userIdConverted)
         if (!userExists) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
-        val formation = formationRepository.findByUserIdAndFormationId(userId, id)
+        val formation = formationRepository.findByUserIdAndFormationId(userIdConverted, formationIdConverted)
                 ?: return ResponseEntity.notFound().build()
         formationRepository.delete(formation)
 

@@ -199,17 +199,19 @@ class RouteController(
     fun deleteRoute(
             @PathVariable @Parameter(description = "The id of the user",
                     example = "1",
-                    required = true) userId: UserId,
+                    required = true) userId: String,
             @PathVariable @Parameter(description = "The id of the route",
                     example = "1",
-                    required = true) id: RouteId,
+                    required = true) id: String,
     ): ResponseEntity<Void> {
-        val userExists = userRepository.existsByUserId(userId)
+        val userIdConverted = UserId.of(NonEmptyString(userId))
+        val routeIdConverted = RouteId.of(NonEmptyString(id))
+        val userExists = userRepository.existsByUserId(userIdConverted)
         if (!userExists) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
-        val route = routeRepository.findByUserIdAndRouteId(userId, id)
+        val route = routeRepository.findByUserIdAndRouteId(userIdConverted, routeIdConverted)
                 ?: return ResponseEntity.notFound().build()
         routeRepository.delete(route)
 
