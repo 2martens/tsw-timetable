@@ -2,6 +2,8 @@ server:
   port: 12100
   shutdown: graceful
   forward-headers-strategy: framework
+  http2:
+    enabled: true
 
 ### technical configurations ###
 management:
@@ -50,10 +52,10 @@ springdoc:
     display-request-duration: true
     operationsSorter: method
     disable-swagger-default-url: true
-    path: '/timetable/v1/doc/'
+    path: '/doc/v1/timetable/'
   default-produces-media-type: 'application/json'
   api-docs:
-    path: '/timetable/v1/api-docs'
+    path: '/api-docs/v1/timetable'
 
 openapi:
   description: |
@@ -82,6 +84,7 @@ de.twomartens.timetable:
   bahn-api:
     client-id: ${DB_CLIENT_ID}
     client-secret: ${DB_CLIENT_SECRET}
+de.twomartens.support.health.greeting: "Good morning"
 
 time:
   defaultTimeZone: Europe/Berlin

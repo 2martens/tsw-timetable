@@ -1,6 +1,6 @@
 package de.twomartens.timetable
 
-import de.twomartens.timetable.support.model.LeadershipStatus
+import de.twomartens.support.model.LeadershipStatus
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.runApplication
@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 
 @EnableMongoAuditing
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = ["de.twomartens.support", "de.twomartens.timetable"])
 open class MainApplication(
         private val leadershipStatus: LeadershipStatus,
         private val leaderProperties: LeaderProperties

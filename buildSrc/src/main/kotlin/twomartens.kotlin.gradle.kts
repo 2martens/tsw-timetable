@@ -16,7 +16,7 @@ val projectSourceCompatibility: String = rootProject.properties["projectSourceCo
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.add("-Xjvm-default=all")
+        freeCompilerArgs.addAll("-Xjvm-default=all", "-Xjsr305=strict")
         jvmTarget.set(JvmTarget.fromTarget(projectSourceCompatibility))
     }
 }

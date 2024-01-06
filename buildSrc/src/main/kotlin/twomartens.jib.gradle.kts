@@ -16,6 +16,6 @@ tasks.named("build") {
 }
 
 tasks.register("cleanCache") {
-    delete("${buildDir}/jib-cache")
-    delete("${buildDir}/libs")
+    delete("${layout.buildDirectory.get().asFile}/jib-cache")
+    delete("${layout.buildDirectory.get().asFile}/libs")
 }
