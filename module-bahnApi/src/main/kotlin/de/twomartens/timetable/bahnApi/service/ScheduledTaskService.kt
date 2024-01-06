@@ -15,6 +15,8 @@ import mu.KotlinLogging
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.cloud.kubernetes.commons.leader.LeaderProperties
 import org.springframework.context.event.EventListener
+import org.springframework.data.mongodb.core.BulkOperations
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.integration.leader.event.OnGrantedEvent
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -27,7 +29,8 @@ class ScheduledTaskService(
         private val leaderProperties: LeaderProperties,
         private val scheduledFetchTaskRepository: ScheduledFetchTaskRepository,
         private val taskFactory: TaskFactory,
-        private val fetchTaskScheduler: FetchTaskScheduler
+        private val fetchTaskScheduler: FetchTaskScheduler,
+        private val mongoTemplate: MongoTemplate
 ) {
     private var createdTime: Instant = Instant.EPOCH
     private var lastUpdate: Instant = Instant.EPOCH
@@ -121,14 +124,13 @@ class ScheduledTaskService(
     }
 
     private fun storeTasksInDatabaseAndStoreCreationTime(newTasks: List<ScheduledFetchTask>) {
-        val savedEntities = scheduledFetchTaskRepository.saveAll(newTasks)
-        storeCreationTime(savedEntities)
-    }
-
-    private fun storeCreationTime(savedEntities: MutableList<ScheduledFetchTask>) {
-        if (savedEntities.isNotEmpty()) {
-            createdTime = savedEntities[savedEntities.lastIndex].created
+        if (newTasks.isNotEmpty()) {
+            createdTime = newTasks.first().created
         }
+        mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED,
+                ScheduledFetchTask::class.java)
+                .insert(newTasks)
+                .execute()
     }
 
     private fun publishTasksCreatedEvent() {
