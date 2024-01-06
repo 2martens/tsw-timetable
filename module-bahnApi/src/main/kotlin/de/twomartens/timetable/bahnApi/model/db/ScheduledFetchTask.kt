@@ -19,7 +19,7 @@ data class ScheduledFetchTask(
         var scheduledExecutionDateTime: LocalDateTime
 ) {
     @Id
-    var id: ObjectId = ObjectId()
+    lateinit var id: ObjectId
 
     @CreatedDate
     lateinit var created: Instant
