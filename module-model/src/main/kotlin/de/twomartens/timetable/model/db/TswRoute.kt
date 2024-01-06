@@ -25,7 +25,7 @@ data class TswRoute(
         var portals: List<Portal>
 ) {
     @Id
-    var id: ObjectId = ObjectId()
+    lateinit var id: ObjectId
 
     @CreatedDate
     lateinit var created: Instant

@@ -22,7 +22,7 @@ data class BahnTimetable(
         var stops: List<BahnStationStop>
 ) {
     @Id
-    var id: ObjectId = ObjectId()
+    lateinit var id: ObjectId
 
     @CreatedDate
     lateinit var created: Instant

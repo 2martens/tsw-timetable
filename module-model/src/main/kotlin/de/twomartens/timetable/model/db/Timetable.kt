@@ -29,7 +29,7 @@ data class Timetable(
         var numberOfServices: ZeroOrPositiveInteger
 ) {
     @Id
-    var id: ObjectId = ObjectId()
+    lateinit var id: ObjectId
 
     @CreatedDate
     lateinit var created: Instant
