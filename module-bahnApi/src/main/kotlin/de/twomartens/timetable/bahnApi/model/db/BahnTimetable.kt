@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
 @Document
-@CompoundIndex(def = "{'eva': 1, 'dateTime': 1}", unique = true)
+@CompoundIndex(def = "{'eva': 1, 'hourAtDay': 1}", unique = true)
 data class BahnTimetable(
         var eva: Eva,
         var hourAtDay: HourAtDay,
