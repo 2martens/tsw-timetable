@@ -37,7 +37,7 @@ class BahnApiService(
         val time = LocalTime.of(hourAtDay.hour.value, 0)
         val body = restClient.get()
                 .uri("https://apis.deutschebahn.com/db-api-marketplace/apis/timetables/v1/plan/" +
-                        "${eva}/${hourAtDay.date.format(dateFormatter)}/${time.format(timeFormatter)}")
+                        "${eva.value}/${hourAtDay.date.format(dateFormatter)}/${time.format(timeFormatter)}")
                 .headers {
                     it.accept = mutableListOf(MediaType.APPLICATION_XML)
                     it.contentType = MediaType.APPLICATION_XML
