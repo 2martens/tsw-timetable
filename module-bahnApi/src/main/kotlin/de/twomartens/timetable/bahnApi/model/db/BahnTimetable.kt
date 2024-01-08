@@ -9,7 +9,6 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.index.CompoundIndex
-import org.springframework.data.mongodb.core.index.TextIndexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
@@ -18,7 +17,7 @@ import java.time.Instant
 data class BahnTimetable(
         var eva: Eva,
         var hourAtDay: HourAtDay,
-        @TextIndexed var station: NonEmptyString,
+        var station: NonEmptyString,
         var stops: List<BahnStationStop>
 ) {
     @Id
