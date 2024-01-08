@@ -6,6 +6,8 @@ import de.twomartens.timetable.bahnApi.repository.ScheduledFetchTaskRepository
 import de.twomartens.timetable.bahnApi.tasks.DeleteScheduledTask
 import de.twomartens.timetable.bahnApi.tasks.FetchTimetableTask
 import de.twomartens.timetable.bahnApi.tasks.StoreTimetableTask
+import de.twomartens.timetable.model.common.RouteId
+import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.types.HourAtDay
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
@@ -24,8 +26,9 @@ class FetchTaskScheduler(
         private val bahnDatabaseService: BahnDatabaseService,
         private val scheduledFetchTaskRepository: ScheduledFetchTaskRepository
 ) {
-    fun scheduleStoreTask(timetable: BahnTimetable, hourAtDay: HourAtDay) {
-        val storeTask = StoreTimetableTask(timetable, hourAtDay, bahnDatabaseService)
+    fun scheduleStoreTask(timetable: BahnTimetable, userId: UserId, routeId: RouteId,
+                          hourAtDay: HourAtDay) {
+        val storeTask = StoreTimetableTask(timetable, userId, routeId, hourAtDay, bahnDatabaseService)
         threadPoolTaskExecutor.execute(storeTask)
     }
 
@@ -78,8 +81,8 @@ class FetchTaskScheduler(
             scheduledFetchTask: ScheduledFetchTask,
             zonedExecutionTime: ZonedDateTime
     ) {
-        val timetableTask = FetchTimetableTask(scheduledFetchTask.eva,
-                scheduledFetchTask.fetchedDateTime,
+        val timetableTask = FetchTimetableTask(scheduledFetchTask.userId, scheduledFetchTask.routeId,
+                scheduledFetchTask.eva, scheduledFetchTask.fetchedDateTime,
                 bahnApiService, this)
         threadPoolTaskScheduler.schedule(timetableTask, zonedExecutionTime.toInstant())
     }

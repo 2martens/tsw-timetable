@@ -6,6 +6,8 @@ import de.twomartens.timetable.bahnApi.model.dto.BahnStation
 import de.twomartens.timetable.bahnApi.model.dto.BahnTimetable
 import de.twomartens.timetable.bahnApi.repository.BahnStationRepository
 import de.twomartens.timetable.bahnApi.repository.BahnTimetableRepository
+import de.twomartens.timetable.model.common.RouteId
+import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.db.Station
 import de.twomartens.timetable.model.repository.StationRepository
 import de.twomartens.timetable.types.HourAtDay
@@ -87,8 +89,9 @@ open class BahnDatabaseService(
                 .execute()
     }
 
-    fun storeTimetable(timetable: BahnTimetable, hourAtDay: HourAtDay) {
-        bahnTimetableRepository.save(bahnTimetableMapper.mapToDB(timetable, hourAtDay))
+    fun storeTimetable(timetable: BahnTimetable, userId: UserId, routeId: RouteId,
+                       hourAtDay: HourAtDay) {
+        bahnTimetableRepository.save(bahnTimetableMapper.mapToDB(timetable, userId, routeId, hourAtDay))
     }
 
     companion object {
