@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
 @Document
-@CompoundIndex(def = "{'userId': 1, 'name': 1}", unique = true)
+@CompoundIndex(def = "{'userId': 1, 'routeId': 1}", unique = true)
 data class TswRoute(
         var userId: UserId,
         var routeId: RouteId,
