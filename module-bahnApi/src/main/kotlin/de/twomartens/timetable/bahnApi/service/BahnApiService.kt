@@ -46,6 +46,7 @@ class BahnApiService(
                 }
                 .retrieve()
                 .body(BahnTimetable::class.java)
-        return body!!
+        body!!.eva = eva
+        return body
     }
 }
