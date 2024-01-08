@@ -13,7 +13,7 @@ open class StoreTimetableTask(
         private val bahnDatabaseService: BahnDatabaseService
 ) : Runnable {
     override fun run() {
-        log.info { "Store timetable: [eva: ${timetable.eva}], station: ${timetable.station}]" }
+        log.info { "Store timetable: [eva: ${timetable.eva}], [station: ${timetable.station}], [hour: ${hourAtDay}]" }
         bahnDatabaseService.storeTimetable(timetable, hourAtDay)
     }
 
