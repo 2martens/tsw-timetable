@@ -1,7 +1,8 @@
 name: Docker image
 on:
   push:
-    branches: [ "main" ]
+    tags:
+      - '*'
   pull_request:
 
 jobs:
@@ -30,7 +31,7 @@ jobs:
           gradle-version: 8.5
           cache-read-only: true
       - name: Create and publish docker image
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         run: ./gradlew -Prelease.useLastTag=true final jib
         env:
           USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
