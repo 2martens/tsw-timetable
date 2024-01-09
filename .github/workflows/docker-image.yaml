@@ -2,12 +2,14 @@ name: Docker image
 on:
   push:
     branches: [ "main" ]
+  pull_request:
 
 jobs:
   build:
     name: Build
     uses: ./.github/workflows/build.yaml
   jib:
+    if: github.repository_owner == '2martens'
     name: Create and publish Docker image
     runs-on: ubuntu-latest
 
@@ -26,7 +28,14 @@ jobs:
           gradle-version: 8.5
           cache-read-only: true
       - name: Create and publish docker image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: ./gradlew -Prelease.useLastTag=true final jib
+        env:
+          USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Create and publish docker image
+        if: github.event_name == 'pull_request'
+        run: ./gradlew snapshot jib
         env:
           USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
