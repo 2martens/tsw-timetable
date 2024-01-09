@@ -10,6 +10,8 @@ on:
         description: Target overlay of deployment
         default: test
         required: true
+permissions:
+  contents: write
 jobs:
   deploy:
     name: Deploy
