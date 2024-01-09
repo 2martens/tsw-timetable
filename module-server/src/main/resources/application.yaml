@@ -28,7 +28,7 @@ management:
 spring:
   cloud:
     config:
-      name: timetable
+      name: tsw-timetable
     kubernetes:
       leader:
         enabled: true
@@ -45,7 +45,7 @@ spring:
         jwt:
           jwk-set-uri: ${KEYCLOAK_URL:https://id.2martens.de}/realms/${KEYCLOAK_REALM:2martens}/protocol/openid-connect/certs
   application:
-    name: timetable
+    name: tsw-timetable
 
 springdoc:
   swagger-ui:
