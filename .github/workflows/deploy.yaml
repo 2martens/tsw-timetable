@@ -10,26 +10,11 @@ on:
         description: Target overlay of deployment
         default: test
         required: true
-permissions:
-  contents: write
 jobs:
   deploy:
     name: Deploy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: 2martens/cloud-configuration
-      - name: Update image version
-        run: |
-          mkdir $HOME/bin
-          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O $HOME/bin/yq && chmod +x $HOME/bin/yq
-          sed -i -r "s/(tag:).*/\1\ \"${{ inputs.image_version }}\"/" argocd/timetable/${{ inputs.target }}/overwrite_values.yaml
-          cd argocd/timetable/${{ inputs.target }} && $HOME/bin/yq '. *= load("overwrite_values.yaml")' default_values.yaml > values.yaml
-      - name: Save modified variable file
-        run: |
-          git add argocd/timetable/${{ inputs.target }}/*
-          git config --global user.name 'Your Name'
-          git config --global user.email 'your-username@users.noreply.github.com'
-          git diff-index --quiet HEAD || git commit -m "chore: Change timetable_image_version to ${{ inputs.image_version }}"
-          git push
+    uses: 2martens/cloud-configuration/.github/workflows/deploy.yaml
+    with:
+      application: timetable
+      image_version: inputs.image_version
+      target: inputs.target
