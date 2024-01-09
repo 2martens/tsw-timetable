@@ -20,3 +20,5 @@ jobs:
       application: timetable
       image_version: ${{ inputs.image_version }}
       target: ${{ inputs.target }}
+    secrets:
+      ACTIONS_GITHUB_TOKEN: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
