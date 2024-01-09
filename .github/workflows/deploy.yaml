@@ -18,5 +18,5 @@ jobs:
     uses: 2martens/cloud-configuration/.github/workflows/deploy.yaml@main
     with:
       application: timetable
-      image_version: inputs.image_version
-      target: inputs.target
+      image_version: ${{ inputs.image_version }}
+      target: ${{ inputs.target }}
