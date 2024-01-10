@@ -128,11 +128,12 @@ class ScheduledTaskService(
 
     private fun storeTasksInDatabaseAndStoreCreationTime(newTasks: List<ScheduledFetchTask>) {
         if (newTasks.isNotEmpty()) {
-            createdTime = newTasks.first().created
+            val firstTask = scheduledFetchTaskRepository.save(newTasks.first())
+            createdTime = firstTask.created
         }
         mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED,
                 ScheduledFetchTask::class.java)
-                .insert(newTasks)
+                .insert(newTasks.subList(1, newTasks.size))
                 .execute()
     }
 
