@@ -38,6 +38,7 @@ class ScheduledTaskService(
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady(event: ApplicationReadyEvent) {
         if (!leaderProperties.isEnabled) {
+            log.info { "Leader election disabled and application ready" }
             val updateTime = Instant.ofEpochMilli(event.timestamp)
             updateTaskCounterAndScheduleTasksIfLeader(updateTime)
         }
@@ -45,6 +46,7 @@ class ScheduledTaskService(
 
     @EventListener(OnGrantedEvent::class)
     fun onLeadershipGranted(event: OnGrantedEvent) {
+        log.info { "Granted leadership" }
         val updateTime = Instant.ofEpochMilli(event.timestamp)
         updateTaskCounterAndScheduleTasksIfLeader(updateTime)
     }
