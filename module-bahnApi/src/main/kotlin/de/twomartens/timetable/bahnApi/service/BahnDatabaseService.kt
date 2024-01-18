@@ -12,6 +12,7 @@ import de.twomartens.timetable.model.db.Station
 import de.twomartens.timetable.model.repository.StationRepository
 import de.twomartens.timetable.types.HourAtDay
 import org.mapstruct.factory.Mappers
+import org.springframework.data.domain.Example
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Service
@@ -91,7 +92,17 @@ open class BahnDatabaseService(
 
     fun storeTimetable(timetable: BahnTimetable, userId: UserId, routeId: RouteId,
                        hourAtDay: HourAtDay) {
-        bahnTimetableRepository.save(bahnTimetableMapper.mapToDB(timetable, userId, routeId, hourAtDay))
+        val matcher = bahnTimetableRepository.getExampleMatcher()
+        val dbTimetable = bahnTimetableMapper.mapToDB(timetable, userId, routeId, hourAtDay)
+        val existingTimetable = bahnTimetableRepository.findOne(Example.of(dbTimetable, matcher))
+        existingTimetable
+                .map {
+                    it.stops = dbTimetable.stops
+                    it.station = dbTimetable.station
+                    it
+                }
+                .orElse(dbTimetable)
+        bahnTimetableRepository.save(dbTimetable)
     }
 
     companion object {

@@ -14,7 +14,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 
 @Document
-@CompoundIndex(def = "{'userId': 1, 'routeId': 1, 'eva': 1, 'fetchedDateTime': 1}", unique = true)
+@CompoundIndex(def = "{'userId': 1, 'routeId': 1, 'eva': 1, 'fetchedDateTime': 1}")
 data class ScheduledFetchTask(
         var userId: UserId,
         var routeId: RouteId,
