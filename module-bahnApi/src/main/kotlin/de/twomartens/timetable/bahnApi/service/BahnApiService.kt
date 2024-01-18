@@ -50,7 +50,7 @@ class BahnApiService(
                 }
                 .retrieve()
                 .onStatus(bahnErrorHandler)
-        log.debug { "Response from DB API, station [${eva.value}], date [$day], hour [$hour]" }
+        log.debug { "Response from DB API, station [${eva.value}], date [$day], hour [$hour], response [$response]" }
         val body = response.body(BahnTimetable::class.java)
         body!!.eva = eva
         return body
