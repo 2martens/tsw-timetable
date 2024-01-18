@@ -39,9 +39,10 @@ class BahnApiService(
         val day = hourAtDay.date.format(dateFormatter)
         val hour = time.format(timeFormatter)
         val responseLogger = BahnResponseLogger()
+        val uri = "https://apis.deutschebahn.com/db-api-marketplace/apis/timetables/v1/plan/" +
+                "${eva.value}/${day}/${hour}"
         val response = restClient.get()
-                .uri("https://apis.deutschebahn.com/db-api-marketplace/apis/timetables/v1/plan/" +
-                        "${eva.value}/${day}/${hour}")
+                .uri(uri)
                 .headers {
                     it.accept = mutableListOf(MediaType.APPLICATION_XML)
                     it.contentType = MediaType.APPLICATION_XML
@@ -50,7 +51,7 @@ class BahnApiService(
                 }
                 .retrieve()
                 .onStatus(responseLogger)
-        log.debug { "Response from DB API, station [${eva.value}], date [$day], hour [$hour]" }
+        log.debug { "Response from DB API, station [${eva.value}], date [$day], hour [$hour], requestURI [$uri]" }
         val body = response.body(BahnTimetable::class.java)
         body!!.eva = eva
         return body
