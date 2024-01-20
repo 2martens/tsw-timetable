@@ -11,7 +11,7 @@ class BahnResponseLogger : ResponseErrorHandler {
 
     override fun handleError(response: ClientHttpResponse) {
         val body = response.body.bufferedReader().use { it.readText() }
-        log.debug { "Status code [${response.statusCode.value()}], status text [${response.statusText}], body [$body]" }
+        log.debug { "Status code [${response.statusCode.value()}], status text [${response.statusText}], headers [${response.headers}], body [$body]" }
     }
 
     companion object {
