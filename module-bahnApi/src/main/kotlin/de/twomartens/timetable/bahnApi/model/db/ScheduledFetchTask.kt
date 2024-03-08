@@ -1,6 +1,8 @@
 package de.twomartens.timetable.bahnApi.model.db
 
 import de.twomartens.timetable.bahnApi.model.Eva
+import de.twomartens.timetable.model.common.RouteId
+import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.types.HourAtDay
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
@@ -12,14 +14,16 @@ import java.time.Instant
 import java.time.LocalDateTime
 
 @Document
-@CompoundIndex(def = "{'eva': 1, 'fetchedDateTime': 1}", unique = true)
+@CompoundIndex(def = "{'userId': 1, 'routeId': 1, 'eva': 1, 'fetchedDateTime': 1}")
 data class ScheduledFetchTask(
+        var userId: UserId,
+        var routeId: RouteId,
         var eva: Eva,
         var fetchedDateTime: HourAtDay,
         var scheduledExecutionDateTime: LocalDateTime
 ) {
     @Id
-    var id: ObjectId = ObjectId()
+    lateinit var id: ObjectId
 
     @CreatedDate
     lateinit var created: Instant

@@ -15,6 +15,8 @@ import mu.KotlinLogging
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.cloud.kubernetes.commons.leader.LeaderProperties
 import org.springframework.context.event.EventListener
+import org.springframework.data.mongodb.core.BulkOperations
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.integration.leader.event.OnGrantedEvent
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -27,7 +29,8 @@ class ScheduledTaskService(
         private val leaderProperties: LeaderProperties,
         private val scheduledFetchTaskRepository: ScheduledFetchTaskRepository,
         private val taskFactory: TaskFactory,
-        private val fetchTaskScheduler: FetchTaskScheduler
+        private val fetchTaskScheduler: FetchTaskScheduler,
+        private val mongoTemplate: MongoTemplate
 ) {
     private var createdTime: Instant = Instant.EPOCH
     private var lastUpdate: Instant = Instant.EPOCH
@@ -35,6 +38,7 @@ class ScheduledTaskService(
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady(event: ApplicationReadyEvent) {
         if (!leaderProperties.isEnabled) {
+            log.info { "Leader election disabled and application ready" }
             val updateTime = Instant.ofEpochMilli(event.timestamp)
             updateTaskCounterAndScheduleTasksIfLeader(updateTime)
         }
@@ -42,6 +46,7 @@ class ScheduledTaskService(
 
     @EventListener(OnGrantedEvent::class)
     fun onLeadershipGranted(event: OnGrantedEvent) {
+        log.info { "Granted leadership" }
         val updateTime = Instant.ofEpochMilli(event.timestamp)
         updateTaskCounterAndScheduleTasksIfLeader(updateTime)
     }
@@ -85,16 +90,19 @@ class ScheduledTaskService(
             val stationId = it.id
             val eva = Eva.of(stationId)
             var hourAtDay = HourAtDay.of(Hour.of(23), fetchDates.previousDay)
-            var newTask = taskFactory.createTaskAndUpdateCounter(eva, hourAtDay)
+            var newTask = taskFactory.createTaskAndUpdateCounter(tswRoute.userId,
+                    tswRoute.routeId, eva, hourAtDay)
             newTasks.add(newTask)
             for (hour in 0..23) {
                 hourAtDay = HourAtDay.of(Hour.of(hour), fetchDates.fetchDate)
-                newTask = taskFactory.createTaskAndUpdateCounter(eva, hourAtDay)
+                newTask = taskFactory.createTaskAndUpdateCounter(tswRoute.userId,
+                        tswRoute.routeId, eva, hourAtDay)
                 newTasks.add(newTask)
             }
             for (hour in 0..3) {
                 hourAtDay = HourAtDay.of(Hour.of(hour), fetchDates.nextDate)
-                newTask = taskFactory.createTaskAndUpdateCounter(eva, hourAtDay)
+                newTask = taskFactory.createTaskAndUpdateCounter(tswRoute.userId,
+                        tswRoute.routeId, eva, hourAtDay)
                 newTasks.add(newTask)
             }
         }
@@ -121,14 +129,14 @@ class ScheduledTaskService(
     }
 
     private fun storeTasksInDatabaseAndStoreCreationTime(newTasks: List<ScheduledFetchTask>) {
-        val savedEntities = scheduledFetchTaskRepository.saveAll(newTasks)
-        storeCreationTime(savedEntities)
-    }
-
-    private fun storeCreationTime(savedEntities: MutableList<ScheduledFetchTask>) {
-        if (savedEntities.isNotEmpty()) {
-            createdTime = savedEntities[savedEntities.lastIndex].created
+        if (newTasks.isNotEmpty()) {
+            val firstTask = scheduledFetchTaskRepository.save(newTasks.first())
+            createdTime = firstTask.created
         }
+        mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED,
+                ScheduledFetchTask::class.java)
+                .insert(newTasks.subList(1, newTasks.size))
+                .execute()
     }
 
     private fun publishTasksCreatedEvent() {

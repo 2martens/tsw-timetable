@@ -23,7 +23,7 @@ data class Formation(
         var length: ZeroOrPositiveInteger
 ) {
     @Id
-    var id: ObjectId = ObjectId()
+    lateinit var id: ObjectId
 
     @CreatedDate
     lateinit var created: Instant

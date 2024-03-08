@@ -1,6 +1,8 @@
 package de.twomartens.timetable.bahnApi.model
 
 import de.twomartens.timetable.bahnApi.model.db.ScheduledFetchTask
+import de.twomartens.timetable.model.common.RouteId
+import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.types.HourAtDay
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -18,10 +20,11 @@ class TaskFactory {
         countTasks(existingTasks)
     }
 
-    fun createTaskAndUpdateCounter(eva: Eva, hourAtDay: HourAtDay): ScheduledFetchTask {
+    fun createTaskAndUpdateCounter(userId: UserId, routeId: RouteId, eva: Eva,
+                                   hourAtDay: HourAtDay): ScheduledFetchTask {
         val fetchDateTime = calculateNextAvailableFetchDateTime(hourAtDay)
         incrementTaskCountForHourAtDay(hourAtDay)
-        return ScheduledFetchTask(eva, hourAtDay, fetchDateTime)
+        return ScheduledFetchTask(userId, routeId, eva, hourAtDay, fetchDateTime)
     }
 
     private fun calculateNextAvailableFetchDateTime(hourAtDay: HourAtDay): LocalDateTime {

@@ -8,7 +8,7 @@ import jakarta.xml.bind.annotation.*
 data class BahnTimetable(
         @field:XmlAttribute var eva: Eva,
         @field:XmlAttribute var station: String,
-        @field:XmlElement(name = "s") var stops: List<BahnStationStop>
+        @field:XmlElement(name = "s") var stops: MutableList<BahnStationStop>
 ) {
-    constructor() : this(Eva.UNKNOWN, "", listOf())
+    constructor() : this(Eva.UNKNOWN, "", mutableListOf())
 }

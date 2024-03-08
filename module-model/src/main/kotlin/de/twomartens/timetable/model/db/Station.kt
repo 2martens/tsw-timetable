@@ -21,7 +21,7 @@ data class Station(
         var platforms: List<Platform>
 ) {
     @Id
-    var id: ObjectId = ObjectId()
+    lateinit var id: ObjectId
 
     @CreatedDate
     lateinit var created: Instant
