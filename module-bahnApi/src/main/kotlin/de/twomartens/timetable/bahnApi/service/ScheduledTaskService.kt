@@ -1,5 +1,6 @@
 package de.twomartens.timetable.bahnApi.service
 
+import de.twomartens.timetable.bahnApi.events.FetchTasksCreatedEvent
 import de.twomartens.timetable.bahnApi.model.Eva
 import de.twomartens.timetable.bahnApi.model.FetchDates
 import de.twomartens.timetable.bahnApi.model.TaskFactory
@@ -10,6 +11,7 @@ import de.twomartens.timetable.types.Hour
 import de.twomartens.timetable.types.HourAtDay
 import mu.KotlinLogging
 import org.springframework.boot.context.event.ApplicationReadyEvent
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.event.EventListener
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -22,7 +24,8 @@ class ScheduledTaskService(
         private val scheduledFetchTaskRepository: ScheduledFetchTaskRepository,
         private val taskFactory: TaskFactory,
         private val fetchTaskScheduler: FetchTaskScheduler,
-        private val mongoTemplate: MongoTemplate
+        private val mongoTemplate: MongoTemplate,
+        private val eventPublisher: ApplicationEventPublisher
 ) {
     private var createdTime: Instant = Instant.EPOCH
     private var lastUpdate: Instant = Instant.EPOCH
@@ -30,6 +33,13 @@ class ScheduledTaskService(
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady(event: ApplicationReadyEvent) {
         log.info { "Application ready" }
+        val updateTime = Instant.ofEpochMilli(event.timestamp)
+        updateTaskCounterAndScheduleTasks(updateTime)
+    }
+
+    @EventListener(ApplicationReadyEvent::class)
+    fun onFetchTasksCreated(event: FetchTasksCreatedEvent) {
+        log.info { "Scheduled tasks created" }
         val updateTime = Instant.ofEpochMilli(event.timestamp)
         updateTaskCounterAndScheduleTasks(updateTime)
     }
@@ -50,6 +60,8 @@ class ScheduledTaskService(
         val newTasks = buildScheduledTasks(tswRoute, fetchDates)
 
         storeTasksInDatabaseAndStoreCreationTime(newTasks)
+        val event = FetchTasksCreatedEvent(this)
+        eventPublisher.publishEvent(event)
     }
 
     private fun calculateDatesToFetch(fetchedDate: LocalDate): FetchDates {
