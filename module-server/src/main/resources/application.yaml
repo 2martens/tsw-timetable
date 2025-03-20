@@ -26,12 +26,6 @@ management:
     http.server.requests: true
 
 spring:
-  cloud:
-    config:
-      name: timetable
-    kubernetes:
-      leader:
-        enabled: true
   main:
     banner-mode: off
   profiles:
@@ -84,6 +78,12 @@ de.twomartens.timetable:
   bahn-api:
     client-id: ${DB_CLIENT_ID}
     client-secret: ${DB_CLIENT_SECRET}
+  greeting: "Hello %s, on millenium"
+  statusprobe:
+    scheduleDuration: 60
+    maxKafkaFailureDuration: 5
+    maxBlobFailureCount: 5
+    maxFailurePercent: 50
 de.twomartens.support.health.greeting: "Good morning"
 
 time:

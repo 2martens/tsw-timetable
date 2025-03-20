@@ -18,7 +18,4 @@ dependencies {
     kapt(libs.mapstruct.processor)
 
     implementation(libs.bundles.spring.boot.security)
-    implementation(libs.spring.cloud.starter.config)
-    implementation(libs.spring.cloud.leader.election)
-    implementation(libs.spring.cloud.starter.bus.kafka)
 }

@@ -18,6 +18,4 @@ dependencies {
 
     implementation(libs.spring.openapi)
     implementation(libs.spring.boot.mongo)
-    implementation(libs.spring.cloud.leader.election)
-    implementation(libs.spring.cloud.starter.bus.kafka)
 }

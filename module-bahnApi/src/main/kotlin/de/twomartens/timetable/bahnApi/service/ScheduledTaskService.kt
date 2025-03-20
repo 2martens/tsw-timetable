@@ -1,8 +1,5 @@
 package de.twomartens.timetable.bahnApi.service
 
-import de.twomartens.support.model.LeadershipStatus
-import de.twomartens.support.service.BusService
-import de.twomartens.timetable.bahnApi.events.ScheduledTasksCreatedEvent
 import de.twomartens.timetable.bahnApi.model.Eva
 import de.twomartens.timetable.bahnApi.model.FetchDates
 import de.twomartens.timetable.bahnApi.model.TaskFactory
@@ -13,20 +10,15 @@ import de.twomartens.timetable.types.Hour
 import de.twomartens.timetable.types.HourAtDay
 import mu.KotlinLogging
 import org.springframework.boot.context.event.ApplicationReadyEvent
-import org.springframework.cloud.kubernetes.commons.leader.LeaderProperties
 import org.springframework.context.event.EventListener
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.integration.leader.event.OnGrantedEvent
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.LocalDate
 
 @Service
 class ScheduledTaskService(
-        private val busService: BusService,
-        private val leadershipStatus: LeadershipStatus,
-        private val leaderProperties: LeaderProperties,
         private val scheduledFetchTaskRepository: ScheduledFetchTaskRepository,
         private val taskFactory: TaskFactory,
         private val fetchTaskScheduler: FetchTaskScheduler,
@@ -37,30 +29,16 @@ class ScheduledTaskService(
 
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady(event: ApplicationReadyEvent) {
-        if (!leaderProperties.isEnabled) {
-            log.info { "Leader election disabled and application ready" }
-            val updateTime = Instant.ofEpochMilli(event.timestamp)
-            updateTaskCounterAndScheduleTasksIfLeader(updateTime)
-        }
-    }
-
-    @EventListener(OnGrantedEvent::class)
-    fun onLeadershipGranted(event: OnGrantedEvent) {
-        log.info { "Granted leadership" }
+        log.info { "Application ready" }
         val updateTime = Instant.ofEpochMilli(event.timestamp)
-        updateTaskCounterAndScheduleTasksIfLeader(updateTime)
+        updateTaskCounterAndScheduleTasks(updateTime)
     }
 
-    @EventListener(ScheduledTasksCreatedEvent::class)
-    fun onScheduledTasksCreated(event: ScheduledTasksCreatedEvent) {
-        updateTaskCounterAndScheduleTasksIfLeader(event.source)
-    }
-
-    private fun updateTaskCounterAndScheduleTasksIfLeader(updateTime: Instant) {
-        log.info { "Update tasks from database and schedule if leader" }
+    private fun updateTaskCounterAndScheduleTasks(updateTime: Instant) {
+        log.info { "Update tasks from database and schedule" }
         val createdTasks = findTasksCreatedSince(lastUpdate)
         updateCounterIfNotUpToDate(updateTime, createdTasks)
-        scheduleTasksIfLeader(createdTasks)
+        scheduleTasks(createdTasks)
         lastUpdate = updateTime
     }
 
@@ -72,7 +50,6 @@ class ScheduledTaskService(
         val newTasks = buildScheduledTasks(tswRoute, fetchDates)
 
         storeTasksInDatabaseAndStoreCreationTime(newTasks)
-        publishTasksCreatedEvent()
     }
 
     private fun calculateDatesToFetch(fetchedDate: LocalDate): FetchDates {
@@ -109,10 +86,8 @@ class ScheduledTaskService(
         return newTasks
     }
 
-    private fun scheduleTasksIfLeader(tasksToSchedule: List<ScheduledFetchTask>) {
-        if (leadershipStatus.isLeader) {
-            fetchTaskScheduler.scheduleFetchTasks(tasksToSchedule)
-        }
+    private fun scheduleTasks(tasksToSchedule: List<ScheduledFetchTask>) {
+        fetchTaskScheduler.scheduleFetchTasks(tasksToSchedule)
     }
 
     private fun updateCounterIfNotUpToDate(updateTime: Instant,
@@ -137,11 +112,6 @@ class ScheduledTaskService(
                 ScheduledFetchTask::class.java)
                 .insert(newTasks.subList(1, newTasks.size))
                 .execute()
-    }
-
-    private fun publishTasksCreatedEvent() {
-        val event = ScheduledTasksCreatedEvent.of(createdTime)
-        busService.publishEvent(event)
     }
 
     companion object {

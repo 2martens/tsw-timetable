@@ -1,13 +1,2 @@
 server.port: 12100
 management.server.port: 12101
-
-
-spring:
-  cloud:
-    kubernetes:
-      leader:
-        enabled: false
-  config:
-    import:
-      - "classpath:config/timetable.yaml"
-      - "optional:configserver:${CONFIGSERVER_SCHEME:http}://${CONFIGSERVER_HOST:localhost}:${CONFIGSERVER_PORT:8888}${CONFIGSERVER_PREFIX:/config}"
