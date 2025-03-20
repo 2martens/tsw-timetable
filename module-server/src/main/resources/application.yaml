@@ -32,6 +32,7 @@ spring:
     default: dev
   data.mongodb:
     uri: ${MONGODB_CONNECTION_STRING}
+    database: timetable
     auto-index-creation: true
   security:
     oauth2:
