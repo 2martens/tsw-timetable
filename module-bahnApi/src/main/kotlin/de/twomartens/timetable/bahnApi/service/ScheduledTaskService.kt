@@ -37,7 +37,7 @@ class ScheduledTaskService(
         updateTaskCounterAndScheduleTasks(updateTime)
     }
 
-    @EventListener(ApplicationReadyEvent::class)
+    @EventListener(FetchTasksCreatedEvent::class)
     fun onFetchTasksCreated(event: FetchTasksCreatedEvent) {
         log.info { "Scheduled tasks created" }
         val updateTime = Instant.ofEpochMilli(event.timestamp)
