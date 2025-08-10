@@ -38,7 +38,9 @@ spring:
     oauth2:
       resourceserver:
         jwt:
+          jws-algorithms: ES256
           jwk-set-uri: ${KEYCLOAK_URL:https://id.2martens.de}/realms/${KEYCLOAK_REALM:twomartens}/protocol/openid-connect/certs
+          issuer-uri: ${KEYCLOAK_URL:https://id.2martens.de}/realms/${KEYCLOAK_REALM:twomartens}
   application:
     name: timetable
 
@@ -79,10 +81,8 @@ de.twomartens.timetable:
   bahn-api:
     client-id: ${DB_CLIENT_ID}
     client-secret: ${DB_CLIENT_SECRET}
-  greeting: "Hello %s, on millenium"
   statusprobe:
     scheduleDuration: 60
-    maxKafkaFailureDuration: 5
     maxBlobFailureCount: 5
     maxFailurePercent: 50
 de.twomartens.support.health.greeting: "Good morning"

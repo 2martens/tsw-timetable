@@ -5,6 +5,7 @@ import de.twomartens.support.model.dto.ErrorMessage
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.authorization.AuthorizationDeniedException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestController
@@ -20,6 +21,12 @@ class ExceptionController : ResponseEntityExceptionHandler() {
             log.info(e.toString())
         }
         return ResponseEntity.status(e.status)
+                .body(ErrorMessage(e.message!!))
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException::class)
+    fun handleDeniedException(e: AuthorizationDeniedException): ResponseEntity<ErrorMessage> {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ErrorMessage(e.message!!))
     }
 

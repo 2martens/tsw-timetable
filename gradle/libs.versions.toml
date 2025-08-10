@@ -126,8 +126,6 @@ spring-boot-server = [
     "spring-ui",
 ]
 spring-boot-security = [
-    "keycloak-core",
-    "keycloak-policy-enforcer",
     "spring-boot-oauth2-resource-server",
     "spring-boot-security",
 ]
