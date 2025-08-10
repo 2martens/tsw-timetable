@@ -36,7 +36,7 @@ open class WebSecurityConfiguration {
                 .csrf { it.disable() }
                 .authorizeHttpRequests { it.requestMatchers(*PERMITTED_PATHS.toTypedArray<String>()).permitAll() }
                 .authorizeHttpRequests { it.requestMatchers(HttpMethod.OPTIONS).permitAll() }
-                .authorizeHttpRequests { it.anyRequest().permitAll() }
+                .authorizeHttpRequests { it.anyRequest().authenticated() }
                 .oauth2ResourceServer { obj: OAuth2ResourceServerConfigurer<HttpSecurity?> -> obj.jwt(Customizer.withDefaults()) }
         return http.build()
     }
