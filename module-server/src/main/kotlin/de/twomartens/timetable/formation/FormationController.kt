@@ -1,7 +1,7 @@
 package de.twomartens.timetable.formation
 
 import de.twomartens.timetable.auth.UserRepository
-import de.twomartens.timetable.configuration.roles.CheckParty
+import de.twomartens.timetable.configuration.roles.CheckSubject
 import de.twomartens.timetable.model.common.FormationId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.Formation
@@ -45,7 +45,7 @@ class FormationController(
     )
     @SecurityRequirement(name = "bearer")
     @SecurityRequirement(name = "oauth2")
-    @CheckParty(partyParamName = "userId")
+    @CheckSubject(partyParamName = "userId")
     @GetMapping("/{userId}/")
     fun getFormations(
             @PathVariable @Parameter(description = "The id of the user",
@@ -98,7 +98,7 @@ class FormationController(
     )
     @SecurityRequirement(name = "bearer")
     @SecurityRequirement(name = "oauth2")
-    @CheckParty(partyParamName = "userId")
+    @CheckSubject(partyParamName = "userId")
     @GetMapping("/{userId}/{id}")
     fun getFormation(
             @PathVariable @Parameter(description = "The id of the user",
@@ -147,7 +147,7 @@ class FormationController(
     )
     @SecurityRequirement(name = "bearer")
     @SecurityRequirement(name = "oauth2")
-    @CheckParty(partyParamName = "userId")
+    @CheckSubject(partyParamName = "userId")
     @PutMapping("/{userId}/{id}")
     fun putFormation(
             @PathVariable @Parameter(description = "The id of the user",
@@ -240,7 +240,7 @@ class FormationController(
     )
     @SecurityRequirement(name = "bearer")
     @SecurityRequirement(name = "oauth2")
-    @CheckParty(partyParamName = "userId")
+    @CheckSubject(partyParamName = "userId")
     @DeleteMapping("/{userId}/{id}")
     fun deleteFormation(
             @PathVariable @Parameter(description = "The id of the user",

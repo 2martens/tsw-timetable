@@ -1,7 +1,7 @@
 package de.twomartens.timetable.configuration
 
-import de.twomartens.timetable.configuration.roles.CheckParty
-import de.twomartens.timetable.configuration.roles.PartyAuthorizationManager
+import de.twomartens.timetable.configuration.roles.CheckSubject
+import de.twomartens.timetable.configuration.roles.SubjectAuthorizationManager
 import org.springframework.aop.support.annotation.AnnotationMatchingPointcut
 import org.springframework.beans.factory.config.BeanDefinition.ROLE_INFRASTRUCTURE
 import org.springframework.context.annotation.Bean
@@ -16,8 +16,8 @@ class AuthorizationManagerConfiguration {
     @Bean
     @Role(ROLE_INFRASTRUCTURE)
     fun checkPartyInterceptor(): AuthorizationManagerBeforeMethodInterceptor {
-        val pointcut = AnnotationMatchingPointcut(null, CheckParty::class.java, true)
-        val interceptor = AuthorizationManagerBeforeMethodInterceptor(pointcut, PartyAuthorizationManager())
+        val pointcut = AnnotationMatchingPointcut(null, CheckSubject::class.java, true)
+        val interceptor = AuthorizationManagerBeforeMethodInterceptor(pointcut, SubjectAuthorizationManager())
         interceptor.order = AuthorizationInterceptorsOrder.PRE_AUTHORIZE.order
         return interceptor
     }

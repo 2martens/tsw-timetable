@@ -6,6 +6,6 @@ import java.lang.annotation.Inherited
 @Retention(AnnotationRetention.RUNTIME)
 @Inherited
 @MustBeDocumented
-annotation class CheckParty(
+annotation class CheckSubject(
         val partyParamName: String    // Name of method argument holding the party ID
 )

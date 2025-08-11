@@ -63,9 +63,8 @@ class UserController(
                         )
                     ]) body: User
     ): ResponseEntity<User> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val jwt = authentication as JwtAuthenticationToken
-        val authorizedParty = jwt.token.getClaimAsString("azp")
+        val authentication = SecurityContextHolder.getContext().authentication as JwtAuthenticationToken
+        val subject = authentication.token.getClaimAsString("sub") ?: authentication.name
         var created = false
 
         val userIdConverted = UserId.of(NonEmptyString(userId))
@@ -73,7 +72,7 @@ class UserController(
         if (user == null) {
             created = true
             user = mapper.mapToDB(body)
-        } else if (authorizedParty == userId) {
+        } else if (subject == userId) {
             user.name = NonEmptyString(body.name)
             user.email = Email.of(NonEmptyString(body.email))
         } else {
