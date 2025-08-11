@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authorization.AuthorizationDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -64,8 +64,8 @@ class UserController(
                     ]) body: User
     ): ResponseEntity<User> {
         val authentication = SecurityContextHolder.getContext().authentication
-        val jwt = authentication as Jwt
-        val authorizedParty = jwt.getClaimAsString("azp")
+        val jwt = authentication as JwtAuthenticationToken
+        val authorizedParty = jwt.token.getClaimAsString("azp")
         var created = false
 
         val userIdConverted = UserId.of(NonEmptyString(userId))
