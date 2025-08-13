@@ -7,15 +7,21 @@ import java.time.format.DateTimeParseException
 import java.util.*
 
 
-class LocalDateTimeAdapter : XmlAdapter<String?, LocalDateTime>() {
+class LocalDateTimeAdapter : XmlAdapter<String?, LocalDateTime?>() {
 
     @Throws(DateTimeParseException::class)
-    override fun unmarshal(xmlValue: String?): LocalDateTime {
+    override fun unmarshal(xmlValue: String?): LocalDateTime? {
+        if (xmlValue == null) {
+            return null
+        }
         return LocalDateTime.parse(xmlValue, dateFormatter.get())
     }
 
     @Throws(DateTimeParseException::class)
-    override fun marshal(kotlinValue: LocalDateTime): String? {
+    override fun marshal(kotlinValue: LocalDateTime?): String? {
+        if (kotlinValue == null) {
+            return null
+        }
         return dateFormatter.get().format(kotlinValue)
     }
 

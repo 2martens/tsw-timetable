@@ -16,13 +16,15 @@ import org.springframework.data.domain.Example
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Service
+import java.time.Clock
 
 @Service
 open class BahnDatabaseService(
         private val bahnStationRepository: BahnStationRepository,
         private val stationRepository: StationRepository,
         private val bahnTimetableRepository: BahnTimetableRepository,
-        private val mongoTemplate: MongoTemplate
+        private val mongoTemplate: MongoTemplate,
+        private val clock: Clock
 ) {
     private val bahnStationMapper = Mappers.getMapper(BahnStationMapper::class.java)
     private val bahnTimetableMapper = Mappers.getMapper(BahnTimetableMapper::class.java)
@@ -93,7 +95,7 @@ open class BahnDatabaseService(
     fun storeTimetable(timetable: BahnTimetable, userId: UserId, routeId: RouteId,
                        hourAtDay: HourAtDay) {
         val matcher = bahnTimetableRepository.getExampleMatcher()
-        val dbTimetable = bahnTimetableMapper.mapToDB(timetable, userId, routeId, hourAtDay)
+        val dbTimetable = bahnTimetableMapper.mapToDB(timetable, userId, routeId, hourAtDay, clock)
         val existingTimetable = bahnTimetableRepository.findOne(Example.of(dbTimetable, matcher))
         existingTimetable
                 .map {
