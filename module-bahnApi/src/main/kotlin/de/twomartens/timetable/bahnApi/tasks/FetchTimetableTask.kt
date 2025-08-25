@@ -4,6 +4,7 @@ import de.twomartens.timetable.bahnApi.model.Eva
 import de.twomartens.timetable.bahnApi.service.BahnApiService
 import de.twomartens.timetable.bahnApi.service.FetchTaskScheduler
 import de.twomartens.timetable.model.common.RouteId
+import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.types.HourAtDay
 import mu.KotlinLogging
@@ -13,6 +14,7 @@ import org.springframework.scheduling.annotation.Async
 open class FetchTimetableTask(
         private val userId: UserId,
         private val routeId: RouteId,
+        private val tswTimetableId: TimetableId,
         private val eva: Eva,
         private val hourAtDay: HourAtDay,
         private val bahnApiService: BahnApiService,
@@ -22,7 +24,7 @@ open class FetchTimetableTask(
             "Fetch timetable: [eva: $eva], [date: ${hourAtDay.date}], [hour: ${hourAtDay.hour}]"
         }
         val timetable = bahnApiService.fetchTimetable(eva, hourAtDay)
-        scheduler.scheduleStoreTask(timetable, userId, routeId, hourAtDay)
+        scheduler.scheduleStoreTask(timetable, userId, routeId, tswTimetableId, hourAtDay)
     }
 
     companion object {

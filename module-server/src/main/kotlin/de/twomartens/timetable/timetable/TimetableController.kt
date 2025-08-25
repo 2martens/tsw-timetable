@@ -181,7 +181,8 @@ class TimetableController(
                     HttpStatus.BAD_REQUEST,
                     "Route name must belong to existing route"
                 )
-            scheduledTaskService.triggerTimetableFetch(route, timetable.fetchDate)
+            scheduledTaskService.triggerTimetableFetch(route, timetable.timetableId,
+                    timetable.fetchDate)
         } else {
             timetable.name = NonEmptyString(body.name)
         }

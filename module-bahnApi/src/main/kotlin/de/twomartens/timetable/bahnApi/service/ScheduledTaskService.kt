@@ -6,6 +6,7 @@ import de.twomartens.timetable.bahnApi.model.FetchDates
 import de.twomartens.timetable.bahnApi.model.TaskFactory
 import de.twomartens.timetable.bahnApi.model.db.ScheduledFetchTask
 import de.twomartens.timetable.bahnApi.repository.ScheduledFetchTaskRepository
+import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.db.TswRoute
 import de.twomartens.timetable.types.Hour
 import de.twomartens.timetable.types.HourAtDay
@@ -52,12 +53,13 @@ class ScheduledTaskService(
         lastUpdate = updateTime
     }
 
-    fun triggerTimetableFetch(tswRoute: TswRoute, fetchedDate: LocalDate) {
+    fun triggerTimetableFetch(tswRoute: TswRoute, tswTimetableId: TimetableId,
+                              fetchedDate: LocalDate) {
         log.info {
             "Trigger timetable fetch: [route ${tswRoute.name}]"
         }
         val fetchDates = calculateDatesToFetch(fetchedDate)
-        val newTasks = buildScheduledTasks(tswRoute, fetchDates)
+        val newTasks = buildScheduledTasks(tswRoute, tswTimetableId, fetchDates)
 
         storeTasksInDatabaseAndStoreCreationTime(newTasks)
         val event = FetchTasksCreatedEvent(this)
@@ -72,6 +74,7 @@ class ScheduledTaskService(
 
     private fun buildScheduledTasks(
             tswRoute: TswRoute,
+            tswTimetableId: TimetableId,
             fetchDates: FetchDates
     ): List<ScheduledFetchTask> {
         val newTasks = mutableListOf<ScheduledFetchTask>()
@@ -80,18 +83,18 @@ class ScheduledTaskService(
             val eva = Eva.of(stationId)
             var hourAtDay = HourAtDay.of(Hour.of(23), fetchDates.previousDay)
             var newTask = taskFactory.createTaskAndUpdateCounter(tswRoute.userId,
-                    tswRoute.routeId, eva, hourAtDay)
+                    tswRoute.routeId, tswTimetableId, eva, hourAtDay)
             newTasks.add(newTask)
             for (hour in 0..23) {
                 hourAtDay = HourAtDay.of(Hour.of(hour), fetchDates.fetchDate)
                 newTask = taskFactory.createTaskAndUpdateCounter(tswRoute.userId,
-                        tswRoute.routeId, eva, hourAtDay)
+                        tswRoute.routeId, tswTimetableId, eva, hourAtDay)
                 newTasks.add(newTask)
             }
             for (hour in 0..3) {
                 hourAtDay = HourAtDay.of(Hour.of(hour), fetchDates.nextDate)
                 newTask = taskFactory.createTaskAndUpdateCounter(tswRoute.userId,
-                        tswRoute.routeId, eva, hourAtDay)
+                        tswRoute.routeId, tswTimetableId, eva, hourAtDay)
                 newTasks.add(newTask)
             }
         }
