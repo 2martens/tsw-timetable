@@ -19,6 +19,7 @@ keycloak = "26.0.4"
 kotlin-logging = "3.0.5"
 kotlin-reflect = "2.2.20"
 kotlin-lombok = "1.9.0"
+postgres = "42.6.0"
 plugin-nebula-release = "17.2.2"
 plugin-lombok = "8.0.1"
 plugin-gradle-versions = "0.46.0"
@@ -83,6 +84,7 @@ mockito-inline = "org.mockito:mockito-inline:5.2.0"
 mockito-junit = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
 kotlin-logging = { module = "io.github.microutils:kotlin-logging-jvm", version.ref = "kotlin-logging" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin-reflect" }
+postgres = { module = "org.postgresql:postgresql", version.ref = "postgres" }
 plugin-nebula-release = { module = "com.netflix.nebula:nebula-release-plugin", version.ref = "plugin-nebula-release" }
 plugin-springboot = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }
 plugin-lombok = { module = "io.freefair.gradle:lombok-plugin", version.ref = "plugin-lombok" }

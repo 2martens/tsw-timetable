@@ -5,8 +5,8 @@ import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.db.Timetable
 import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.repository.MongoRepository
-import java.awt.print.Pageable
 
 interface TimetableRepository : MongoRepository<Timetable, ObjectId> {
     fun findByUserIdAndTimetableId(userId: UserId, timetableId: TimetableId): Timetable?

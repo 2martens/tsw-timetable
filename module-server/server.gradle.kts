@@ -19,4 +19,6 @@ dependencies {
 
     implementation(libs.spring.boot.batch)
     implementation(libs.bundles.spring.boot.security)
+
+    runtimeOnly(libs.postgres)
 }

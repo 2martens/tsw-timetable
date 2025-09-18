@@ -32,7 +32,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.data.domain.Sort
 import org.springframework.transaction.PlatformTransactionManager
 
-@EnableBatchProcessing
+@EnableBatchProcessing(databaseType = "POSTGRES")
 @Configuration
 class BatchProcessTimetableConfiguration {
 
