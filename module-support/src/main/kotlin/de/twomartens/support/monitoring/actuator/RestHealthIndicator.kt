@@ -8,6 +8,7 @@ import org.springframework.boot.actuate.health.Status
 import org.springframework.boot.autoconfigure.web.ServerProperties
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import java.security.SecureRandom
 import java.time.Clock
 
@@ -44,9 +45,12 @@ class RestHealthIndicator(
      */
     override fun determineHealth(): Health {
         val random = randomizer.nextInt(100000, 999999).toString()
-        val url = "$urlPrefix{random}"
-        val response = restTemplateRestHealthIndicator.getForEntity(url, String::class.java, random)
-        val status = if (response.body == serviceProperties.greeting.format(random)) Status.UP else Status.DOWN
+        val url = "$urlPrefix{$random}"
+        val response = restClientRestHealthIndicator.get()
+                .uri(url)
+                .retrieve()
+                .body<String>()
+        val status = if (response == serviceProperties.greeting.format(random)) Status.UP else Status.DOWN
         return Health.status(status)
                 .withDetail(DETAIL_ENDPOINT_KEY, url)
                 .build()
