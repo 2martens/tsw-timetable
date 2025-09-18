@@ -7,6 +7,7 @@ import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.Timetable
 import de.twomartens.timetable.model.dto.TimetableState
 import de.twomartens.timetable.route.TswRouteRepository
+import de.twomartens.timetable.service.TimetableProcessingScheduler
 import de.twomartens.timetable.types.NonEmptyString
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -32,7 +33,8 @@ class TimetableController(
         private val routeRepository: TswRouteRepository,
         private val timetableRepository: TimetableRepository,
         private val userRepository: UserRepository,
-        private val scheduledTaskService: ScheduledTaskService
+        private val scheduledTaskService: ScheduledTaskService,
+        private val timetableProcessingScheduler: TimetableProcessingScheduler
 ) {
 
     private val mapper = Mappers.getMapper(TimetableMapper::class.java)
@@ -171,7 +173,7 @@ class TimetableController(
         if (timetable == null) {
             created = true
             timetable = mapper.mapToDB(userIdConverted, body)
-            timetable.timetableState = TimetableState.PROCESSING
+            timetable.timetableState = TimetableState.FETCHING_TIMETABLES
 
             if (!timetable.fetchDate.isAfter(LocalDate.now(clock))) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Date of timetable must be in the future")
@@ -183,6 +185,7 @@ class TimetableController(
                 )
             scheduledTaskService.triggerTimetableFetch(route, timetable.timetableId,
                     timetable.fetchDate)
+            timetableProcessingScheduler.scheduleTimetableProcessing(timetable)
         } else {
             timetable.name = NonEmptyString(body.name)
         }

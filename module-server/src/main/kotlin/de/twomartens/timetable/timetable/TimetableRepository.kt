@@ -4,10 +4,15 @@ import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.db.Timetable
 import org.bson.types.ObjectId
+import org.springframework.data.domain.Page
 import org.springframework.data.mongodb.repository.MongoRepository
+import java.awt.print.Pageable
 
 interface TimetableRepository : MongoRepository<Timetable, ObjectId> {
     fun findByUserIdAndTimetableId(userId: UserId, timetableId: TimetableId): Timetable?
     fun findAllByUserIdAndNameContainingIgnoreCase(userId: UserId, name: String): List<Timetable>
     fun findAllByUserId(userId: UserId): List<Timetable>
+
+    // is used
+    fun getTimetableByUserIdAndTimetableId(userId: UserId, timetableId: TimetableId, pageable: Pageable): Page<Timetable>
 }

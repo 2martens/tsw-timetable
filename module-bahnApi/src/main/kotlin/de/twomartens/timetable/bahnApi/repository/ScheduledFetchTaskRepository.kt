@@ -2,6 +2,8 @@ package de.twomartens.timetable.bahnApi.repository
 
 import de.twomartens.timetable.bahnApi.model.Eva
 import de.twomartens.timetable.bahnApi.model.db.ScheduledFetchTask
+import de.twomartens.timetable.model.common.TimetableId
+import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.types.HourAtDay
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.repository.MongoRepository
@@ -11,4 +13,6 @@ interface ScheduledFetchTaskRepository : MongoRepository<ScheduledFetchTask, Obj
     fun findByEvaAndFetchedDateTime(eva: Eva, fetchedDateTime: HourAtDay): ScheduledFetchTask?
 
     fun findAllByCreatedAfter(createdAt: Instant): List<ScheduledFetchTask>
+
+    fun findScheduledFetchTaskByUserIdAndTswTimetableId(userId: UserId, tswTimetableId: TimetableId): List<ScheduledFetchTask>
 }

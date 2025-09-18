@@ -30,6 +30,7 @@ plugin-jib = "3.4.0"
 spring-boot = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 spring-boot-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 spring-boot-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-batch = { module = "org.springframework.boot:spring-boot-starter-batch" }
 spring-boot-log4j = { module = "org.springframework.boot:spring-boot-starter-log4j2" }
 spring-boot-thymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf" }
 spring-boot-mongo = { module = "org.springframework.boot:spring-boot-starter-data-mongodb" }

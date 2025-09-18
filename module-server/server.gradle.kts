@@ -17,5 +17,6 @@ dependencies {
     annotationProcessor(libs.mapstruct.processor)
     kapt(libs.mapstruct.processor)
 
+    implementation(libs.spring.boot.batch)
     implementation(libs.bundles.spring.boot.security)
 }
