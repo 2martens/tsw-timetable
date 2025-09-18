@@ -7,7 +7,7 @@ import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.boot.actuate.health.Status
 import org.springframework.boot.autoconfigure.web.ServerProperties
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.RestClient
 import java.security.SecureRandom
 import java.time.Clock
 
@@ -31,7 +31,7 @@ import java.time.Clock
 class RestHealthIndicator(
         clock: Clock, interceptor: HeaderInterceptorRest,
         serverProperties: ServerProperties,
-        private val restTemplateRestHealthIndicator: RestTemplate,
+        private val restClientRestHealthIndicator: RestClient,
         private val serviceProperties: HealthCheckProperties
 ) : AbstractHealthIndicator(clock, Preparable { interceptor.markAsHealthCheck() }), HealthIndicator {
     private val randomizer = SecureRandom()
