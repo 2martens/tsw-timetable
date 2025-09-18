@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
 @Document
-@CompoundIndex(def = "{'userId': 1, 'tswTimetableId': 1}")
+@CompoundIndex(def = "{'userId': 1, 'tswTimetableId': 1}", unique = true)
 data class ScheduledProcessTimetableTask(
         var userId: UserId,
         var timetableId: TimetableId,
