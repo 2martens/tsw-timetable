@@ -2,7 +2,6 @@ package de.twomartens.timetable.service
 
 import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.common.UserId
-import de.twomartens.timetable.model.db.Timetable
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
@@ -16,7 +15,6 @@ import java.time.Instant
 data class ScheduledProcessTimetableTask(
         var userId: UserId,
         var timetableId: TimetableId,
-        var timetable: Timetable,
         var executionTime: Instant
 ) {
     @Id

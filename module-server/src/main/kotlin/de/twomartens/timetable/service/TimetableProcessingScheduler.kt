@@ -1,6 +1,7 @@
 package de.twomartens.timetable.service
 
 import de.twomartens.timetable.model.db.Timetable
+import de.twomartens.timetable.timetable.TimetableRepository
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.boot.context.event.ApplicationReadyEvent
@@ -16,6 +17,7 @@ class TimetableProcessingScheduler(
         private val asyncJobLauncher: JobLauncher,
         private val threadPoolTaskScheduler: ThreadPoolTaskScheduler,
         private val repository: ScheduledProcessTimetableTaskRepository,
+        private val timetableRepository: TimetableRepository,
         private val clock: Clock,
         private val eventPublisher: ApplicationEventPublisher
 ) {
@@ -24,7 +26,7 @@ class TimetableProcessingScheduler(
         val tasks = repository.findScheduledProcessTimetableTasksByExecutionTimeAfter(clock.instant())
         tasks.forEach {
             val task = ProcessTimetableTask(asyncJobLauncher, processTimetableJob,
-                    it.timetable, repository, it)
+                    timetableRepository, repository, it)
             threadPoolTaskScheduler.schedule(task, it.executionTime)
         }
     }
@@ -33,13 +35,13 @@ class TimetableProcessingScheduler(
     fun onProcessTimetableTaskScheduled(event: ProcessTimetableTaskScheduledEvent) {
         val source = event.source as ScheduledProcessTimetableTask
         val task = ProcessTimetableTask(asyncJobLauncher, processTimetableJob,
-                source.timetable, repository, source)
+                timetableRepository, repository, source)
         threadPoolTaskScheduler.schedule(task, source.executionTime)
     }
 
     fun scheduleTimetableProcessing(timetable: Timetable) {
         val task = ScheduledProcessTimetableTask(timetable.userId, timetable.timetableId,
-                timetable, timetable.fetchDate.plusDays(2)
+                timetable.fetchDate.plusDays(2)
                 .atStartOfDay(clock.zone).toInstant())
         repository.save(task)
         val event = ProcessTimetableTaskScheduledEvent(task)

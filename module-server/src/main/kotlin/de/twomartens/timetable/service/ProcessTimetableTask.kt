@@ -1,7 +1,7 @@
 package de.twomartens.timetable.service
 
-import de.twomartens.timetable.model.db.Timetable
 import de.twomartens.timetable.model.dto.TimetableState
+import de.twomartens.timetable.timetable.TimetableRepository
 import mu.KotlinLogging
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobParametersBuilder
@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.Async
 class ProcessTimetableTask(
         private val asyncJobLauncher: JobLauncher,
         private val processTimetableJob: Job,
-        private val tswTimetable: Timetable,
+        private val timetableRepository: TimetableRepository,
         private val repository: ScheduledProcessTimetableTaskRepository,
         private val scheduledTask: ScheduledProcessTimetableTask) : Runnable {
 
@@ -24,14 +24,15 @@ class ProcessTimetableTask(
     }
 
     fun processTimetable() {
-        if (tswTimetable.timetableState != TimetableState.TIMETABLES_FETCHED) {
-            log.info("Timetable ${tswTimetable.timetableId} is not in TIMETABLES_FETCHED state")
+        val timetable = timetableRepository.findByUserIdAndTimetableId(scheduledTask.userId, scheduledTask.timetableId)!!
+        if (timetable.timetableState != TimetableState.TIMETABLES_FETCHED) {
+            log.info("Timetable ${scheduledTask.timetableId} is not in TIMETABLES_FETCHED state")
             return
         }
 
         val jobParameters = JobParametersBuilder()
-                .addString("timetableId", tswTimetable.timetableId.value)
-                .addString("userId", tswTimetable.userId.value)
+                .addString("timetableId", scheduledTask.timetableId.value)
+                .addString("userId", scheduledTask.userId.value)
                 .toJobParameters()
 
         try {
