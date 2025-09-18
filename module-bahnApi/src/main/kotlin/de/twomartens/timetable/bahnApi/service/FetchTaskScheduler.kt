@@ -9,6 +9,7 @@ import de.twomartens.timetable.bahnApi.tasks.StoreTimetableTask
 import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.types.HourAtDay
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import org.springframework.stereotype.Service
@@ -24,7 +25,8 @@ class FetchTaskScheduler(
         private val threadPoolTaskExecutor: ThreadPoolTaskExecutor,
         private val bahnApiService: BahnApiService,
         private val bahnDatabaseService: BahnDatabaseService,
-        private val scheduledFetchTaskRepository: ScheduledFetchTaskRepository
+        private val scheduledFetchTaskRepository: ScheduledFetchTaskRepository,
+        private val eventPublisher: ApplicationEventPublisher
 ) {
     fun scheduleStoreTask(timetable: BahnTimetable, userId: UserId, tswTimetableId: TimetableId,
                           hourAtDay: HourAtDay) {
