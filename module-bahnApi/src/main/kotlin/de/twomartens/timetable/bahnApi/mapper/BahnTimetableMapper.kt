@@ -3,7 +3,6 @@ package de.twomartens.timetable.bahnApi.mapper
 import de.twomartens.timetable.bahnApi.model.db.BahnStationStop
 import de.twomartens.timetable.bahnApi.model.db.BahnStopEvent
 import de.twomartens.timetable.bahnApi.model.db.BahnTimetable
-import de.twomartens.timetable.model.common.RouteId
 import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.types.HourAtDay
@@ -22,12 +21,11 @@ interface BahnTimetableMapper {
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastModified", ignore = true)
     fun mapToDB(dto: de.twomartens.timetable.bahnApi.model.dto.BahnTimetable,
-                userId: UserId, routeId: RouteId, tswTimetableId: TimetableId,
+                userId: UserId, tswTimetableId: TimetableId,
                 hourAtDay: HourAtDay,
                 clock: Clock): BahnTimetable {
         return BahnTimetable(
                 userId,
-                routeId,
                 tswTimetableId,
                 dto.eva,
                 ZonedDateTime.of(hourAtDay.dateTime, clock.zone),

@@ -1,7 +1,6 @@
 package de.twomartens.timetable.bahnApi.model.db
 
 import de.twomartens.timetable.bahnApi.model.Eva
-import de.twomartens.timetable.model.common.RouteId
 import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.types.NonEmptyString
@@ -15,11 +14,10 @@ import java.time.Instant
 import java.time.ZonedDateTime
 
 @Document
-@CompoundIndex(def = "{'userId': 1, 'routeId': 1, 'tswTimetableId': 1, 'eva': 1, 'hourAtDay': 1}",
+@CompoundIndex(def = "{'userId': 1, 'tswTimetableId': 1, 'eva': 1, 'hourAtDay': 1}",
         unique = true)
 data class BahnTimetable(
         var userId: UserId,
-        var routeId: RouteId,
         var tswTimetableId: TimetableId,
         var eva: Eva,
         var hourAtDay: ZonedDateTime,

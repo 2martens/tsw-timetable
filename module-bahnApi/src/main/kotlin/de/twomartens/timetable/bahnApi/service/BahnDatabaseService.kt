@@ -6,7 +6,6 @@ import de.twomartens.timetable.bahnApi.model.dto.BahnStation
 import de.twomartens.timetable.bahnApi.model.dto.BahnTimetable
 import de.twomartens.timetable.bahnApi.repository.BahnStationRepository
 import de.twomartens.timetable.bahnApi.repository.BahnTimetableRepository
-import de.twomartens.timetable.model.common.RouteId
 import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.db.Station
@@ -93,11 +92,10 @@ open class BahnDatabaseService(
                 .execute()
     }
 
-    fun storeTimetable(timetable: BahnTimetable, userId: UserId, routeId: RouteId,
-                       tswTimetableId: TimetableId,
+    fun storeTimetable(timetable: BahnTimetable, userId: UserId, tswTimetableId: TimetableId,
                        hourAtDay: HourAtDay) {
         val matcher = bahnTimetableRepository.getExampleMatcher()
-        val dbTimetable = bahnTimetableMapper.mapToDB(timetable, userId, routeId,
+        val dbTimetable = bahnTimetableMapper.mapToDB(timetable, userId,
                 tswTimetableId, hourAtDay, clock)
         val existingTimetable = bahnTimetableRepository.findOne(Example.of(dbTimetable, matcher))
         existingTimetable

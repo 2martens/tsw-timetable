@@ -83,18 +83,18 @@ class ScheduledTaskService(
             val eva = Eva.of(stationId)
             var hourAtDay = HourAtDay.of(Hour.of(23), fetchDates.previousDay)
             var newTask = taskFactory.createTaskAndUpdateCounter(tswRoute.userId,
-                    tswRoute.routeId, tswTimetableId, eva, hourAtDay)
+                    tswTimetableId, eva, hourAtDay)
             newTasks.add(newTask)
             for (hour in 0..23) {
                 hourAtDay = HourAtDay.of(Hour.of(hour), fetchDates.fetchDate)
                 newTask = taskFactory.createTaskAndUpdateCounter(tswRoute.userId,
-                        tswRoute.routeId, tswTimetableId, eva, hourAtDay)
+                        tswTimetableId, eva, hourAtDay)
                 newTasks.add(newTask)
             }
             for (hour in 0..3) {
                 hourAtDay = HourAtDay.of(Hour.of(hour), fetchDates.nextDate)
                 newTask = taskFactory.createTaskAndUpdateCounter(tswRoute.userId,
-                        tswRoute.routeId, tswTimetableId, eva, hourAtDay)
+                        tswTimetableId, eva, hourAtDay)
                 newTasks.add(newTask)
             }
         }

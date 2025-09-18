@@ -2,7 +2,6 @@ package de.twomartens.timetable.bahnApi.tasks
 
 import de.twomartens.timetable.bahnApi.model.dto.BahnTimetable
 import de.twomartens.timetable.bahnApi.service.BahnDatabaseService
-import de.twomartens.timetable.model.common.RouteId
 import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.types.HourAtDay
@@ -13,14 +12,13 @@ import org.springframework.scheduling.annotation.Async
 open class StoreTimetableTask(
         private val timetable: BahnTimetable,
         private val userId: UserId,
-        private val routeId: RouteId,
         private val tswTimetableId: TimetableId,
         private val hourAtDay: HourAtDay,
         private val bahnDatabaseService: BahnDatabaseService
 ) : Runnable {
     override fun run() {
         log.info { "Store timetable: [eva: ${timetable.eva}], [station: ${timetable.station}], [hour: ${hourAtDay}]" }
-        bahnDatabaseService.storeTimetable(timetable, userId, routeId, tswTimetableId, hourAtDay)
+        bahnDatabaseService.storeTimetable(timetable, userId, tswTimetableId, hourAtDay)
     }
 
     companion object {

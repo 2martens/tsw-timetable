@@ -6,7 +6,6 @@ import de.twomartens.timetable.bahnApi.repository.ScheduledFetchTaskRepository
 import de.twomartens.timetable.bahnApi.tasks.DeleteScheduledTask
 import de.twomartens.timetable.bahnApi.tasks.FetchTimetableTask
 import de.twomartens.timetable.bahnApi.tasks.StoreTimetableTask
-import de.twomartens.timetable.model.common.RouteId
 import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.types.HourAtDay
@@ -27,10 +26,9 @@ class FetchTaskScheduler(
         private val bahnDatabaseService: BahnDatabaseService,
         private val scheduledFetchTaskRepository: ScheduledFetchTaskRepository
 ) {
-    fun scheduleStoreTask(timetable: BahnTimetable, userId: UserId, routeId: RouteId,
-                          tswTimetableId: TimetableId,
+    fun scheduleStoreTask(timetable: BahnTimetable, userId: UserId, tswTimetableId: TimetableId,
                           hourAtDay: HourAtDay) {
-        val storeTask = StoreTimetableTask(timetable, userId, routeId, tswTimetableId,
+        val storeTask = StoreTimetableTask(timetable, userId, tswTimetableId,
                 hourAtDay, bahnDatabaseService)
         threadPoolTaskExecutor.execute(storeTask)
     }
@@ -76,7 +74,7 @@ class FetchTaskScheduler(
             scheduledFetchTask: ScheduledFetchTask,
             zonedExecutionTime: ZonedDateTime
     ) {
-        val deleteTask = DeleteScheduledTask(scheduledFetchTaskRepository, scheduledFetchTask)
+        val deleteTask = DeleteScheduledTask(scheduledFetchTaskRepository, scheduledFetchTask, eventPublisher)
         threadPoolTaskScheduler.schedule(deleteTask, zonedExecutionTime.toInstant())
     }
 
@@ -84,7 +82,7 @@ class FetchTaskScheduler(
             scheduledFetchTask: ScheduledFetchTask,
             zonedExecutionTime: ZonedDateTime
     ) {
-        val timetableTask = FetchTimetableTask(scheduledFetchTask.userId, scheduledFetchTask.routeId,
+        val timetableTask = FetchTimetableTask(scheduledFetchTask.userId,
                 scheduledFetchTask.tswTimetableId,
                 scheduledFetchTask.eva, scheduledFetchTask.fetchedDateTime,
                 bahnApiService, this)
