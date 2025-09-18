@@ -45,9 +45,9 @@ class RestHealthIndicator(
      */
     override fun determineHealth(): Health {
         val random = randomizer.nextInt(100000, 999999).toString()
-        val url = "$urlPrefix{$random}"
+        val url = "$urlPrefix{random}"
         val response = restClientRestHealthIndicator.get()
-                .uri(url)
+                .uri(url, random)
                 .retrieve()
                 .body<String>()
         val status = if (response == serviceProperties.greeting.format(random)) Status.UP else Status.DOWN
