@@ -34,6 +34,10 @@ spring:
     uri: ${MONGODB_CONNECTION_STRING}
     database: timetable
     auto-index-creation: true
+  datasource:
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
   security:
     oauth2:
       resourceserver:
