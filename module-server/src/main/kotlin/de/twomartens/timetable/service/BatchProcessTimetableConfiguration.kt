@@ -2,14 +2,14 @@ package de.twomartens.timetable.service
 
 import de.twomartens.timetable.bahnApi.model.db.BahnTimetable
 import de.twomartens.timetable.bahnApi.repository.BahnTimetableRepository
-import de.twomartens.timetable.model.common.ServiceId
-import de.twomartens.timetable.model.common.TimetableId
-import de.twomartens.timetable.model.common.UserId
+import de.twomartens.timetable.model.common.*
 import de.twomartens.timetable.model.db.Service
 import de.twomartens.timetable.model.db.ServiceRepository
 import de.twomartens.timetable.model.db.ServiceStop
 import de.twomartens.timetable.model.db.Timetable
 import de.twomartens.timetable.model.dto.TimetableState
+import de.twomartens.timetable.model.repository.StationRepository
+import de.twomartens.timetable.route.TswRouteRepository
 import de.twomartens.timetable.timetable.TimetableRepository
 import de.twomartens.timetable.types.NonEmptyString
 import org.springframework.batch.core.Job
@@ -112,6 +112,9 @@ class BatchProcessTimetableConfiguration {
                        transactionManager: PlatformTransactionManager,
                        stopStorageRequestRepository: StopStorageRequestRepository,
                        serviceRepository: ServiceRepository,
+                       stationRepository: StationRepository,
+                       timetableRepository: TimetableRepository,
+                       routeRepository: TswRouteRepository,
                        @Value("#{jobParameters}") jobParameters: JobParameters): Step {
         val userId = UserId.of(NonEmptyString(jobParameters.getString("userId")!!))
         val timetableId = TimetableId.of(NonEmptyString(jobParameters.getString("timetableId")!!))
@@ -125,7 +128,6 @@ class BatchProcessTimetableConfiguration {
                 .saveState(true)
                 .build()
 
-
         val processor = ItemProcessor<StopStorageRequest, Service> {
             val serviceId = ServiceId.of(NonEmptyString(it.trainNumber))
             val serviceExists = serviceRepository.existsServiceByUserIdAndTimetableIdAndServiceId(
@@ -136,6 +138,18 @@ class BatchProcessTimetableConfiguration {
             } else {
                 Service(userId, timetableId, serviceId)
             }
+
+            val timetable = timetableRepository.findByUserIdAndTimetableId(userId, timetableId)!!
+            val route = routeRepository.findByUserIdAndRouteId(userId, timetable.routeId)!!
+            val station = stationRepository.findByCountryCodeAndStationId(
+                    route.country.code,
+                    StationId.of(NonEmptyString(route.country.code + "-" + it.eva)))!!
+            val arrivalPlatform = buildPlatform(it.plannedArrivalPlatform)
+            station.addPlatform(arrivalPlatform)
+            val departurePlatform = buildPlatform(it.plannedDeparturePlatform)
+            station.addPlatform(departurePlatform)
+            stationRepository.save(station) // yes, this violates the pure function principle
+
             service.addStop(ServiceStop(
                     it.eva,
                     it.plannedArrivalTime,
@@ -191,5 +205,29 @@ class BatchProcessTimetableConfiguration {
                 .processor(processor)
                 .writer(writer)
                 .build()
+    }
+
+    private fun buildPlatform(platformString: String?): Platform? {
+        if (platformString == null) {
+            return null
+        }
+
+        val platformFormat = Regex("(<track>\\d+)(?:\\s+(<sections>[\\w-]+))?")
+        val matchResult = platformFormat.matchEntire(platformString) ?: return null
+        val track = matchResult.groups["track"]?.value ?: return null
+        val platform = Platform(track)
+        val sectionsString = matchResult.groups["sections"]?.value ?: return platform
+        val sectionRangeEndpoints = sectionsString.split("-")
+        val sections = if (sectionRangeEndpoints.size == 1) {
+            setOf(Section.of(NonEmptyString(sectionRangeEndpoints[0])))
+        } else {
+            (sectionRangeEndpoints[0].toCharArray()[0]..
+                    sectionRangeEndpoints[1].toCharArray()[0]).map {
+                Section.of(NonEmptyString(it.toString()))
+            }
+        }
+        platform.addAllSections(sections)
+
+        return platform
     }
 }

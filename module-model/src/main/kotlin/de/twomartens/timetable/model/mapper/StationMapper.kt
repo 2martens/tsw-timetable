@@ -16,12 +16,13 @@ interface StationMapper {
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "lastModified", ignore = true)
     fun mapToDB(countryCode: CountryCode, dto: Station): de.twomartens.timetable.model.db.Station {
-        return de.twomartens.timetable.model.db.Station(
+        val station = de.twomartens.timetable.model.db.Station(
                 StationId.of(NonEmptyString(countryCode.countryCode.value + "-" + dto.id)),
                 countryCode,
-                NonEmptyString(dto.name),
-                dto.platforms
+                NonEmptyString(dto.name)
         )
+        station.addAllPlatforms(dto.platforms)
+        return station
     }
 
     fun mapStationsToDto(stations: List<de.twomartens.timetable.model.db.Station>): List<Station>
