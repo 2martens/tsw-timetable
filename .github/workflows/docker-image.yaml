@@ -47,7 +47,7 @@ jobs:
       - name: Extract Jib digest
         id: digest
         run: |
-          DIGEST=$(cat build/jib-image.digest)
+          DIGEST=$(cat ./build/jib-image.digest)
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
       - name: Perform docker login
         uses: docker/login-action@v3
