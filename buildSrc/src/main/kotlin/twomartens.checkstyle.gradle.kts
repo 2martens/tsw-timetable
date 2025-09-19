@@ -1,10 +1,10 @@
 plugins {
-    checkstyle
+    id("checkstyle")
     id("twomartens.java-base")
 }
 
 checkstyle {
-    toolVersion = "10.0"
+    toolVersion = "10.12.4"
     isIgnoreFailures = false
     maxWarnings = 0
 

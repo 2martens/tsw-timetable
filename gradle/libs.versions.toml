@@ -26,6 +26,7 @@ plugin-gradle-versions = "0.46.0"
 plugin-version-catalog = "0.8.0"
 plugin-kotlin-gradle = "1.9.21"
 plugin-jib = "3.4.5"
+plugin-checkstyle = "10.12.4"
 
 [libraries]
 spring-boot = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
@@ -93,6 +94,7 @@ plugin-version-catalog = { module = "nl.littlerobots.vcu:plugin", version.ref = 
 plugin-kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "plugin-kotlin-gradle" }
 plugin-kotlin-spring = { module = "org.jetbrains.kotlin.plugin.spring:org.jetbrains.kotlin.plugin.spring.gradle.plugin", version.ref = "plugin-kotlin-gradle" }
 plugin-jib = { module = "com.google.cloud.tools:jib-gradle-plugin", version.ref = "plugin-jib" }
+plugin-chekstyle = { module = "com.puppycrawl.tools:checkstyle", version.ref = "plugin-checkstyle" }
 
 [bundles]
 logging = [
@@ -143,3 +145,4 @@ test = [
 
 [plugins]
 kotlin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "kotlin-lombok" }
+checkstyle = { id = "com.puppycrawl.tools.checkstyle", version.ref = "plugin-checkstyle" }

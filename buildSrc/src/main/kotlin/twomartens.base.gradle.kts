@@ -1,5 +1,5 @@
 plugins {
-    idea
+    id("idea")
 }
 
 val projectgroup: String = providers.gradleProperty("projectgroup").get()
