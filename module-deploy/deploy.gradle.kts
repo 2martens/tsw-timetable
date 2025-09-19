@@ -34,5 +34,6 @@ jib {
         mainClass = "de.twomartens.timetable.MainApplicationKt"
         jvmFlags = listOf("-XX:+UseContainerSupport",
                 "-XX:MaxRAMPercentage=75.0")
+        user = "nobody"
     }
 }
