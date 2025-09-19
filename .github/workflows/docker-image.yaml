@@ -16,6 +16,9 @@ jobs:
     if: github.repository_owner == '2martens'
     name: Create and publish Docker image
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      attestations: write
 
     steps:
       - uses: actions/checkout@v4
@@ -32,12 +35,32 @@ jobs:
       - name: Create and publish docker image
         if: github.event_name == 'push'
         run: ./gradlew -Prelease.useLastTag=true final jib
+        id: push
         env:
           USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Create and publish docker image
         if: github.event_name == 'pull_request'
         run: ./gradlew snapshot jib
+        id: push
         env:
           USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Extract Jib digest
+        id: digest
+        run: |
+          DIGEST=$(cat build/jib-image.digest)
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+      - name: Perform docker login
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Attest
+        uses: actions/attest-build-provenance@v3
+        id: attest
+        with:
+          subject-name: docker.io/2martens/timetable
+          subject-digest: ${{ steps.digest.outputs.digest }}
+          push-to-registry: true
