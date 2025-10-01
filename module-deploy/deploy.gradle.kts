@@ -36,4 +36,5 @@ jib {
                 "-XX:MaxRAMPercentage=75.0")
         user = "nobody"
     }
+    outputPaths.digest = "${layout.buildDirectory.get().asFile}/jib-image.digest"
 }
