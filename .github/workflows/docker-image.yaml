@@ -34,6 +34,17 @@ jobs:
         with:
           gradle-version: 9.1.0
           cache-read-only: true
+      - name: Perform login for ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Perform login for docker.io
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Create and publish docker image
         if: github.event_name == 'push'
         run: gradle -Prelease.useLastTag=true final jib
@@ -58,17 +69,6 @@ jobs:
             echo "arch${n}=$d" >> $GITHUB_OUTPUT
             n=$((n+1))
           done
-      - name: Perform login for ghcr.io
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Perform login for docker.io
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
