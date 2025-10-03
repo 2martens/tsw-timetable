@@ -49,11 +49,13 @@ jobs:
         run: |
           DIGEST_FILE=${{ github.workspace }}/module-deploy/build/jib-image.digest
           INDEX_DIGEST=$(cat $DIGEST_FILE)
+          echo "Index digest: $INDEX_DIGEST"
           echo "digest=$INDEX_DIGEST" >> $GITHUB_OUTPUT
           ARCH_DIGESTS=$(docker manifest inspect 2martens/timetable@$INDEX_DIGEST | jq -r '.manifests[].digest')
           n=0
           for d in $ARCH_DIGESTS; do
             echo "arch${n}=$d" >> $GITHUB_OUTPUT
+            echo "arch${n} digest=$d"
             n=$((n+1))
           done
       - name: Perform docker login
