@@ -21,7 +21,7 @@ jib {
         }
     }
     to {
-        image = "2martens/timetable"
+        image = "ghcr.io/2martens/timetable"
         tags = setOf(
                 "latest",
                 properties["version"].toString().replace("+", "-"))
