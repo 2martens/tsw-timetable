@@ -58,31 +58,36 @@ jobs:
             echo "arch${n}=$d" >> $GITHUB_OUTPUT
             n=$((n+1))
           done
-      - name: Perform docker login
+      - name: Perform login for ghcr.io
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Perform login for docker.io
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/2martens/timetable
+          images: ghcr.io/2martens/tsw-timetable
       - uses: anchore/sbom-action@v0
         with:
-          image: ghcr.io/2martens/timetable
+          image: ghcr.io/2martens/tsw-timetable@${{ steps.digest.outputs.digest }}
           output-file: sbom.json
       - name: Attest
         uses: actions/attest-build-provenance@v3
         with:
-          subject-name: ghcr.io/2martens/timetable
+          subject-name: ghcr.io/2martens/tsw-timetable
           subject-digest: ${{ steps.digest.outputs.digest }}
           push-to-registry: true
       - name: Generate SBOM attestation
         uses: actions/attest-sbom@v2
         with:
-          subject-name: ghcr.io/2martens/timetable
+          subject-name: ghcr.io/2martens/tsw-timetable
           subject-digest: ${{ steps.digest.outputs.digest }}
           sbom-path: 'sbom.json'
           push-to-registry: true
