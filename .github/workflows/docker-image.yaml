@@ -64,21 +64,18 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Attest
         uses: actions/attest-build-provenance@v3
-        id: attest
         with:
           subject-name: docker.io/2martens/timetable
           subject-digest: ${{ steps.digest.outputs.digest }}
           push-to-registry: true
       - name: Attest first arch
         uses: actions/attest-build-provenance@v3
-        id: attest
         with:
           subject-name: docker.io/2martens/timetable
           subject-digest: ${{ steps.digest.outputs.arch0 }}
           push-to-registry: true
       - name: Attest second arch
         uses: actions/attest-build-provenance@v3
-        id: attest
         with:
           subject-name: docker.io/2martens/timetable
           subject-digest: ${{ steps.digest.outputs.arch1 }}
