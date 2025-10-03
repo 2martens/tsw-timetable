@@ -47,7 +47,7 @@ jobs:
       - name: Extract Jib digest
         id: digest
         run: |
-          DIGEST_FILE=${{ github.workspace }}/build/jib-image.digest
+          DIGEST_FILE=${{ github.workspace }}/module-deploy/build/jib-image.digest
           echo "digest=$(cat $DIGEST_FILE)" >> $GITHUB_OUTPUT
       - name: Perform docker login
         uses: docker/login-action@v3
