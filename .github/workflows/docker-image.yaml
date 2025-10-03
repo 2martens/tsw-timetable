@@ -48,7 +48,14 @@ jobs:
         id: digest
         run: |
           DIGEST_FILE=${{ github.workspace }}/module-deploy/build/jib-image.digest
-          echo "digest=$(cat $DIGEST_FILE)" >> $GITHUB_OUTPUT
+          INDEX_DIGEST=$(cat $DIGEST_FILE)
+          echo "digest=$INDEX_DIGEST" >> $GITHUB_OUTPUT
+          ARCH_DIGESTS=$(docker manifest inspect 2martens/timetable@$INDEX_DIGEST | jq -r '.manifests[].digest')
+          n=0
+          for d in $ARCH_DIGESTS; do
+            echo "arch${n}=$d" >> $GITHUB_OUTPUT
+            n=$((n+1))
+          done
       - name: Perform docker login
         uses: docker/login-action@v3
         with:
@@ -61,4 +68,18 @@ jobs:
         with:
           subject-name: docker.io/2martens/timetable
           subject-digest: ${{ steps.digest.outputs.digest }}
+          push-to-registry: true
+      - name: Attest first arch
+        uses: actions/attest-build-provenance@v3
+        id: attest
+        with:
+          subject-name: docker.io/2martens/timetable
+          subject-digest: ${{ steps.digest.outputs.arch0 }}
+          push-to-registry: true
+      - name: Attest second arch
+        uses: actions/attest-build-provenance@v3
+        id: attest
+        with:
+          subject-name: docker.io/2martens/timetable
+          subject-digest: ${{ steps.digest.outputs.arch1 }}
           push-to-registry: true
