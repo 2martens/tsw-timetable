@@ -18,4 +18,4 @@ jobs:
         with:
           gradle-version: 9.1.0
       - name: Run build and tests
-        run: ./gradlew buildAll
+        run: gradle buildAll
