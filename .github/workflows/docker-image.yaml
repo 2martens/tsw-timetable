@@ -67,7 +67,7 @@ jobs:
       - uses: anchore/sbom-action@v0
         with:
           image: docker.io/2martens/timetable
-          artifact-name: sbom.json
+          output-file: sbom.json
       - name: Attest
         uses: actions/attest-build-provenance@v3
         with:
