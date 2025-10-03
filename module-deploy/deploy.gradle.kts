@@ -10,7 +10,7 @@ dependencies {
 
 jib {
     from {
-        image = "public.ecr.aws/docker/library/amazoncorretto:" + properties["projectSourceCompatibility"] + "-alpine"
+        image = "public.ecr.aws/docker/library/amazoncorretto:21-alpine@sha256:fda60fd7965970ce7ed7ce789b18418647b56ac6112fc17df006337bdc6355c4"
         platforms {
             platform {
                 architecture = "amd64"
