@@ -49,13 +49,11 @@ jobs:
         run: |
           DIGEST_FILE=${{ github.workspace }}/module-deploy/build/jib-image.digest
           INDEX_DIGEST=$(cat $DIGEST_FILE)
-          echo "Index digest: $INDEX_DIGEST"
           echo "digest=$INDEX_DIGEST" >> $GITHUB_OUTPUT
           ARCH_DIGESTS=$(docker manifest inspect 2martens/timetable@$INDEX_DIGEST | jq -r '.manifests[].digest')
           n=0
           for d in $ARCH_DIGESTS; do
             echo "arch${n}=$d" >> $GITHUB_OUTPUT
-            echo "arch${n} digest=$d"
             n=$((n+1))
           done
       - name: Perform docker login
@@ -64,9 +62,20 @@ jobs:
           registry: docker.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - uses: anchore/sbom-action@v0
+        with:
+          image: docker.io/2martens/timetable
+          artifact-name: sbom.json
       - name: Attest
         uses: actions/attest-build-provenance@v3
         with:
           subject-name: index.docker.io/2martens/timetable
           subject-digest: ${{ steps.digest.outputs.digest }}
+          push-to-registry: true
+      - name: Generate SBOM attestation
+        uses: actions/attest-sbom@v2
+        with:
+          subject-name: index.docker.io/2martens/timetable
+          subject-digest: ${{ steps.digest.outputs.digest }}
+          sbom-path: 'sbom.json'
           push-to-registry: true
