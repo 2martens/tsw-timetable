@@ -1,6 +1,7 @@
 package de.twomartens.timetable.route
 
 import de.twomartens.timetable.auth.UserRepository
+import de.twomartens.timetable.configuration.roles.CheckSubject
 import de.twomartens.timetable.model.common.RouteId
 import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.TswRoute
@@ -43,6 +44,7 @@ class RouteController(
     )
     @SecurityRequirement(name = "bearer")
     @SecurityRequirement(name = "oauth2")
+    @CheckSubject(partyParamName = "userId")
     @GetMapping("/{userId}/")
     fun getRoutes(
             @PathVariable @Parameter(description = "The id of the user",
@@ -87,6 +89,7 @@ class RouteController(
     )
     @SecurityRequirement(name = "bearer")
     @SecurityRequirement(name = "oauth2")
+    @CheckSubject(partyParamName = "userId")
     @GetMapping("/{userId}/{id}")
     fun getRoute(
             @PathVariable @Parameter(description = "The id of the user",
@@ -130,6 +133,7 @@ class RouteController(
     )
     @SecurityRequirement(name = "bearer")
     @SecurityRequirement(name = "oauth2")
+    @CheckSubject(partyParamName = "userId")
     @PutMapping("/{userId}/{id}")
     fun putRoute(
             @PathVariable @Parameter(description = "The id of the user",
@@ -195,6 +199,7 @@ class RouteController(
     )
     @SecurityRequirement(name = "bearer")
     @SecurityRequirement(name = "oauth2")
+    @CheckSubject(partyParamName = "userId")
     @DeleteMapping("/{userId}/{id}")
     fun deleteRoute(
             @PathVariable @Parameter(description = "The id of the user",

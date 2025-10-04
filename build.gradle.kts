@@ -10,8 +10,6 @@ nebulaRelease {
 versionCatalogUpdate {
     sortByKey.set(false)
     keep {
-        keepUnusedVersions.set(true)
-        keepUnusedLibraries.set(true)
-        keepUnusedPlugins.set(true)
+        keepUnusedVersions = true
     }
 }

@@ -26,24 +26,25 @@ management:
     http.server.requests: true
 
 spring:
-  cloud:
-    config:
-      name: timetable
-    kubernetes:
-      leader:
-        enabled: true
   main:
     banner-mode: off
   profiles:
     default: dev
   data.mongodb:
     uri: ${MONGODB_CONNECTION_STRING}
+    database: timetable
     auto-index-creation: true
+  datasource:
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
   security:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: ${KEYCLOAK_URL:https://id.2martens.de}/realms/${KEYCLOAK_REALM:2martens}/protocol/openid-connect/certs
+          jws-algorithms: ES256
+          jwk-set-uri: ${KEYCLOAK_URL:https://id.2martens.de}/realms/${KEYCLOAK_REALM:twomartens}/protocol/openid-connect/certs
+          issuer-uri: ${KEYCLOAK_URL:https://id.2martens.de}/realms/${KEYCLOAK_REALM:twomartens}
   application:
     name: timetable
 
@@ -84,6 +85,10 @@ de.twomartens.timetable:
   bahn-api:
     client-id: ${DB_CLIENT_ID}
     client-secret: ${DB_CLIENT_SECRET}
+  statusprobe:
+    scheduleDuration: 60
+    maxBlobFailureCount: 5
+    maxFailurePercent: 50
 de.twomartens.support.health.greeting: "Good morning"
 
 time:

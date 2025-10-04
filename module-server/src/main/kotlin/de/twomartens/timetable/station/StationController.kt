@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.mapstruct.factory.Mappers
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -87,6 +88,7 @@ class StationController(
     )
     @SecurityRequirement(name = "bearer")
     @SecurityRequirement(name = "oauth2")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/update")
     fun updateStations(): ResponseEntity<Void> {
         val stations = bahnApiService.fetchStations("*")

@@ -22,7 +22,7 @@ open class WebConfiguration(private val headerInterceptorRest: HeaderInterceptor
         )
         registration.allowCredentials(true)
         registration.allowedOrigins(
-                "http://localhost:4200",
+                "http://localhost:8100",
                 "https://timetable.2martens.de"
         )
     }

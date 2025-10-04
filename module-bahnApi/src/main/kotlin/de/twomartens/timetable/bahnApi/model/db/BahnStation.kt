@@ -19,7 +19,7 @@ data class BahnStation(
         var db: Boolean
 ) {
     @Id
-    var id: ObjectId = ObjectId()
+    lateinit var id: ObjectId
 
     @CreatedDate
     lateinit var created: Instant

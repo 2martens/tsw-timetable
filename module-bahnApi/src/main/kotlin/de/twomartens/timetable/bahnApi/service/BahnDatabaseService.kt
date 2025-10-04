@@ -6,20 +6,25 @@ import de.twomartens.timetable.bahnApi.model.dto.BahnStation
 import de.twomartens.timetable.bahnApi.model.dto.BahnTimetable
 import de.twomartens.timetable.bahnApi.repository.BahnStationRepository
 import de.twomartens.timetable.bahnApi.repository.BahnTimetableRepository
+import de.twomartens.timetable.model.common.TimetableId
+import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.db.Station
 import de.twomartens.timetable.model.repository.StationRepository
 import de.twomartens.timetable.types.HourAtDay
 import org.mapstruct.factory.Mappers
+import org.springframework.data.domain.Example
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Service
+import java.time.Clock
 
 @Service
 open class BahnDatabaseService(
         private val bahnStationRepository: BahnStationRepository,
         private val stationRepository: StationRepository,
         private val bahnTimetableRepository: BahnTimetableRepository,
-        private val mongoTemplate: MongoTemplate
+        private val mongoTemplate: MongoTemplate,
+        private val clock: Clock
 ) {
     private val bahnStationMapper = Mappers.getMapper(BahnStationMapper::class.java)
     private val bahnTimetableMapper = Mappers.getMapper(BahnTimetableMapper::class.java)
@@ -87,8 +92,20 @@ open class BahnDatabaseService(
                 .execute()
     }
 
-    fun storeTimetable(timetable: BahnTimetable, hourAtDay: HourAtDay) {
-        bahnTimetableRepository.save(bahnTimetableMapper.mapToDB(timetable, hourAtDay))
+    fun storeTimetable(timetable: BahnTimetable, userId: UserId, tswTimetableId: TimetableId,
+                       hourAtDay: HourAtDay) {
+        val matcher = bahnTimetableRepository.getExampleMatcher()
+        val dbTimetable = bahnTimetableMapper.mapToDB(timetable, userId,
+                tswTimetableId, hourAtDay, clock)
+        val existingTimetable = bahnTimetableRepository.findOne(Example.of(dbTimetable, matcher))
+        existingTimetable
+                .map {
+                    it.stops = dbTimetable.stops
+                    it.station = dbTimetable.station
+                    it
+                }
+                .orElse(dbTimetable)
+        bahnTimetableRepository.save(dbTimetable)
     }
 
     companion object {

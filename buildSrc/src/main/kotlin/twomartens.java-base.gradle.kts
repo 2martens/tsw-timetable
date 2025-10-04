@@ -1,8 +1,8 @@
 plugins {
-    java
-    `java-library`
+    id("java")
+    id("java-library")
     id("twomartens.base")
-    application
+    id("application")
 }
 
 val projectSourceCompatibility: String = rootProject.properties["projectSourceCompatibility"].toString()

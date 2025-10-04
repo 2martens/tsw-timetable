@@ -15,7 +15,7 @@ permissions:
 jobs:
   deploy:
     name: Deploy
-    uses: 2martens/cloud-configuration/.github/workflows/deploy.yaml@main
+    uses: 2martens/cloud-configuration/.github/workflows/update-image-version.yaml@main
     with:
       application: timetable
       image_version: ${{ inputs.image_version }}

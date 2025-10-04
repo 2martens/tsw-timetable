@@ -1,73 +1,69 @@
 package de.twomartens.timetable.bahnApi.service
 
-import de.twomartens.support.model.LeadershipStatus
-import de.twomartens.support.service.BusService
-import de.twomartens.timetable.bahnApi.events.ScheduledTasksCreatedEvent
+import de.twomartens.timetable.bahnApi.events.FetchTasksCreatedEvent
 import de.twomartens.timetable.bahnApi.model.Eva
 import de.twomartens.timetable.bahnApi.model.FetchDates
 import de.twomartens.timetable.bahnApi.model.TaskFactory
 import de.twomartens.timetable.bahnApi.model.db.ScheduledFetchTask
 import de.twomartens.timetable.bahnApi.repository.ScheduledFetchTaskRepository
+import de.twomartens.timetable.model.common.TimetableId
 import de.twomartens.timetable.model.db.TswRoute
 import de.twomartens.timetable.types.Hour
 import de.twomartens.timetable.types.HourAtDay
 import mu.KotlinLogging
 import org.springframework.boot.context.event.ApplicationReadyEvent
-import org.springframework.cloud.kubernetes.commons.leader.LeaderProperties
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.event.EventListener
-import org.springframework.integration.leader.event.OnGrantedEvent
+import org.springframework.data.mongodb.core.BulkOperations
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.LocalDate
 
 @Service
 class ScheduledTaskService(
-        private val busService: BusService,
-        private val leadershipStatus: LeadershipStatus,
-        private val leaderProperties: LeaderProperties,
         private val scheduledFetchTaskRepository: ScheduledFetchTaskRepository,
         private val taskFactory: TaskFactory,
-        private val fetchTaskScheduler: FetchTaskScheduler
+        private val fetchTaskScheduler: FetchTaskScheduler,
+        private val mongoTemplate: MongoTemplate,
+        private val eventPublisher: ApplicationEventPublisher
 ) {
     private var createdTime: Instant = Instant.EPOCH
     private var lastUpdate: Instant = Instant.EPOCH
 
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady(event: ApplicationReadyEvent) {
-        if (!leaderProperties.isEnabled) {
-            val updateTime = Instant.ofEpochMilli(event.timestamp)
-            updateTaskCounterAndScheduleTasksIfLeader(updateTime)
-        }
-    }
-
-    @EventListener(OnGrantedEvent::class)
-    fun onLeadershipGranted(event: OnGrantedEvent) {
+        log.info { "Application ready" }
         val updateTime = Instant.ofEpochMilli(event.timestamp)
-        updateTaskCounterAndScheduleTasksIfLeader(updateTime)
+        updateTaskCounterAndScheduleTasks(updateTime)
     }
 
-    @EventListener(ScheduledTasksCreatedEvent::class)
-    fun onScheduledTasksCreated(event: ScheduledTasksCreatedEvent) {
-        updateTaskCounterAndScheduleTasksIfLeader(event.source)
+    @EventListener(FetchTasksCreatedEvent::class)
+    fun onFetchTasksCreated(event: FetchTasksCreatedEvent) {
+        log.info { "Scheduled tasks created" }
+        val updateTime = Instant.ofEpochMilli(event.timestamp)
+        updateTaskCounterAndScheduleTasks(updateTime)
     }
 
-    private fun updateTaskCounterAndScheduleTasksIfLeader(updateTime: Instant) {
-        log.info { "Update tasks from database and schedule if leader" }
+    private fun updateTaskCounterAndScheduleTasks(updateTime: Instant) {
+        log.info { "Update tasks from database and schedule" }
         val createdTasks = findTasksCreatedSince(lastUpdate)
         updateCounterIfNotUpToDate(updateTime, createdTasks)
-        scheduleTasksIfLeader(createdTasks)
+        scheduleTasks(createdTasks)
         lastUpdate = updateTime
     }
 
-    fun triggerTimetableFetch(tswRoute: TswRoute, fetchedDate: LocalDate) {
+    fun triggerTimetableFetch(tswRoute: TswRoute, tswTimetableId: TimetableId,
+                              fetchedDate: LocalDate) {
         log.info {
             "Trigger timetable fetch: [route ${tswRoute.name}]"
         }
         val fetchDates = calculateDatesToFetch(fetchedDate)
-        val newTasks = buildScheduledTasks(tswRoute, fetchDates)
+        val newTasks = buildScheduledTasks(tswRoute, tswTimetableId, fetchDates)
 
         storeTasksInDatabaseAndStoreCreationTime(newTasks)
-        publishTasksCreatedEvent()
+        val event = FetchTasksCreatedEvent(this)
+        eventPublisher.publishEvent(event)
     }
 
     private fun calculateDatesToFetch(fetchedDate: LocalDate): FetchDates {
@@ -78,6 +74,7 @@ class ScheduledTaskService(
 
     private fun buildScheduledTasks(
             tswRoute: TswRoute,
+            tswTimetableId: TimetableId,
             fetchDates: FetchDates
     ): List<ScheduledFetchTask> {
         val newTasks = mutableListOf<ScheduledFetchTask>()
@@ -85,26 +82,27 @@ class ScheduledTaskService(
             val stationId = it.id
             val eva = Eva.of(stationId)
             var hourAtDay = HourAtDay.of(Hour.of(23), fetchDates.previousDay)
-            var newTask = taskFactory.createTaskAndUpdateCounter(eva, hourAtDay)
+            var newTask = taskFactory.createTaskAndUpdateCounter(tswRoute.userId,
+                    tswTimetableId, eva, hourAtDay)
             newTasks.add(newTask)
             for (hour in 0..23) {
                 hourAtDay = HourAtDay.of(Hour.of(hour), fetchDates.fetchDate)
-                newTask = taskFactory.createTaskAndUpdateCounter(eva, hourAtDay)
+                newTask = taskFactory.createTaskAndUpdateCounter(tswRoute.userId,
+                        tswTimetableId, eva, hourAtDay)
                 newTasks.add(newTask)
             }
             for (hour in 0..3) {
                 hourAtDay = HourAtDay.of(Hour.of(hour), fetchDates.nextDate)
-                newTask = taskFactory.createTaskAndUpdateCounter(eva, hourAtDay)
+                newTask = taskFactory.createTaskAndUpdateCounter(tswRoute.userId,
+                        tswTimetableId, eva, hourAtDay)
                 newTasks.add(newTask)
             }
         }
         return newTasks
     }
 
-    private fun scheduleTasksIfLeader(tasksToSchedule: List<ScheduledFetchTask>) {
-        if (leadershipStatus.isLeader) {
-            fetchTaskScheduler.scheduleFetchTasks(tasksToSchedule)
-        }
+    private fun scheduleTasks(tasksToSchedule: List<ScheduledFetchTask>) {
+        fetchTaskScheduler.scheduleFetchTasks(tasksToSchedule)
     }
 
     private fun updateCounterIfNotUpToDate(updateTime: Instant,
@@ -121,19 +119,14 @@ class ScheduledTaskService(
     }
 
     private fun storeTasksInDatabaseAndStoreCreationTime(newTasks: List<ScheduledFetchTask>) {
-        val savedEntities = scheduledFetchTaskRepository.saveAll(newTasks)
-        storeCreationTime(savedEntities)
-    }
-
-    private fun storeCreationTime(savedEntities: MutableList<ScheduledFetchTask>) {
-        if (savedEntities.isNotEmpty()) {
-            createdTime = savedEntities[savedEntities.lastIndex].created
+        if (newTasks.isNotEmpty()) {
+            val firstTask = scheduledFetchTaskRepository.save(newTasks.first())
+            createdTime = firstTask.created
         }
-    }
-
-    private fun publishTasksCreatedEvent() {
-        val event = ScheduledTasksCreatedEvent.of(createdTime)
-        busService.publishEvent(event)
+        mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED,
+                ScheduledFetchTask::class.java)
+                .insert(newTasks.subList(1, newTasks.size))
+                .execute()
     }
 
     companion object {

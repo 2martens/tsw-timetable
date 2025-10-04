@@ -33,8 +33,7 @@ interface BahnStationMapper {
         return Station(
                 StationId.of(NonEmptyString(countryCode + "-" + db.eva.value.toString())),
                 CountryCode(NonEmptyString(countryCode)),
-                db.name,
-                listOf()
+                db.name
         )
     }
 }

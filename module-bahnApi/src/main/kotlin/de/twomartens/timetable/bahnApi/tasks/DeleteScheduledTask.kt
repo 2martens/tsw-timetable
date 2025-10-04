@@ -1,14 +1,17 @@
 package de.twomartens.timetable.bahnApi.tasks
 
+import de.twomartens.timetable.bahnApi.events.ScheduledTaskDeletedEvent
 import de.twomartens.timetable.bahnApi.model.db.ScheduledFetchTask
 import de.twomartens.timetable.bahnApi.repository.ScheduledFetchTaskRepository
 import mu.KotlinLogging
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.scheduling.annotation.Async
 
 @Async
 open class DeleteScheduledTask(
         private val scheduledFetchTaskRepository: ScheduledFetchTaskRepository,
-        private val scheduledFetchTask: ScheduledFetchTask
+        val scheduledFetchTask: ScheduledFetchTask,
+        private val eventPublisher: ApplicationEventPublisher
 ) : Runnable {
     override fun run() {
         log.info {
@@ -18,6 +21,7 @@ open class DeleteScheduledTask(
                     "[time: ${scheduledFetchTask.fetchedDateTime.hour}]"
         }
         scheduledFetchTaskRepository.delete(scheduledFetchTask)
+        eventPublisher.publishEvent(ScheduledTaskDeletedEvent(this))
     }
 
     companion object {

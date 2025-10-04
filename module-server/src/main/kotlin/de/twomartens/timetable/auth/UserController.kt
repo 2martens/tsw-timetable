@@ -14,6 +14,9 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.mapstruct.factory.Mappers
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.authorization.AuthorizationDeniedException
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -60,6 +63,8 @@ class UserController(
                         )
                     ]) body: User
     ): ResponseEntity<User> {
+        val authentication = SecurityContextHolder.getContext().authentication as JwtAuthenticationToken
+        val subject = authentication.token.getClaimAsString("sub") ?: authentication.name
         var created = false
 
         val userIdConverted = UserId.of(NonEmptyString(userId))
@@ -67,9 +72,11 @@ class UserController(
         if (user == null) {
             created = true
             user = mapper.mapToDB(body)
-        } else {
+        } else if (subject == userId) {
             user.name = NonEmptyString(body.name)
             user.email = Email.of(NonEmptyString(body.email))
+        } else {
+            throw AuthorizationDeniedException("The user is not authorized to update this user")
         }
 
         userRepository.save(user)

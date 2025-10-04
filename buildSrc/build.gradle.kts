@@ -10,6 +10,7 @@ repositories {
 dependencies {
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
     implementation(libs.plugin.kotlin.gradle)
+    implementation(libs.plugin.kotlin.spring)
     implementation(libs.plugin.springboot)
     implementation(libs.plugin.lombok)
     implementation(libs.plugin.nebula.release)

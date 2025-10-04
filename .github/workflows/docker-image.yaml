@@ -1,0 +1,94 @@
+name: Docker image
+on:
+  push:
+    tags:
+      - '*'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yaml
+  jib:
+    needs:
+      - build
+    if: github.repository_owner == '2martens'
+    name: Create and publish Docker image
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      attestations: write
+      actions: read
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 9.1.0
+          cache-read-only: true
+      - name: Perform login for ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Perform login for docker.io
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Create and publish docker image
+        if: github.event_name == 'push'
+        run: gradle -Prelease.useLastTag=true final jib
+        env:
+          USERNAME: ${{ github.actor }}
+          PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create and publish docker image
+        if: github.event_name == 'pull_request'
+        run: gradle snapshot jib
+        env:
+          USERNAME: ${{ github.actor }}
+          PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract Jib digest
+        id: digest
+        run: |
+          DIGEST_FILE=${{ github.workspace }}/module-deploy/build/jib-image.digest
+          INDEX_DIGEST=$(cat $DIGEST_FILE)
+          echo "digest=$INDEX_DIGEST" >> $GITHUB_OUTPUT
+          ARCH_DIGESTS=$(docker manifest inspect ghcr.io/2martens/timetable@$INDEX_DIGEST | jq -r '.manifests[].digest')
+          n=0
+          for d in $ARCH_DIGESTS; do
+            echo "arch${n}=$d" >> $GITHUB_OUTPUT
+            n=$((n+1))
+          done
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/2martens/tsw-timetable
+      - uses: anchore/sbom-action@v0
+        with:
+          image: ghcr.io/2martens/tsw-timetable@${{ steps.digest.outputs.digest }}
+          output-file: sbom.json
+      - name: Attest
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-name: ghcr.io/2martens/tsw-timetable
+          subject-digest: ${{ steps.digest.outputs.digest }}
+          push-to-registry: true
+      - name: Generate SBOM attestation
+        uses: actions/attest-sbom@v2
+        with:
+          subject-name: ghcr.io/2martens/tsw-timetable
+          subject-digest: ${{ steps.digest.outputs.digest }}
+          sbom-path: 'sbom.json'
+          push-to-registry: true

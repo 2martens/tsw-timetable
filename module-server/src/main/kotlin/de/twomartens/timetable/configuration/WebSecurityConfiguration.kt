@@ -1,73 +1,34 @@
 package de.twomartens.timetable.configuration
 
-import de.twomartens.support.security.SpringPolicyEnforcerFilter
-import org.keycloak.adapters.authorization.spi.ConfigurationResolver
-import org.keycloak.adapters.authorization.spi.HttpRequest
-import org.keycloak.representations.adapters.config.PolicyEnforcerConfig
-import org.keycloak.representations.adapters.config.PolicyEnforcerConfig.EnforcementMode
-import org.keycloak.representations.adapters.config.PolicyEnforcerConfig.PathConfig
-import org.keycloak.util.JsonSerialization
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.Customizer
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer
-import org.springframework.security.oauth2.jwt.JwtDecoder
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
-import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
-import java.io.IOException
+import org.springframework.web.cors.CorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 open class WebSecurityConfiguration {
-    @Value("\${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
-    private lateinit var jwkSetUri: String
-
-    @Value("#{environment.CLIENT_SECRET}")
-    private lateinit var clientSecret: String
-
     @Bean
     @Throws(Exception::class)
-    open fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    open fun securityFilterChain(http: HttpSecurity,
+                                 @Qualifier("corsApplication") corsConfiguration: CorsConfigurationSource): SecurityFilterChain {
         http
+                .cors { it.configurationSource(corsConfiguration) }
                 .csrf { it.disable() }
+                .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
                 .authorizeHttpRequests { it.requestMatchers(*PERMITTED_PATHS.toTypedArray<String>()).permitAll() }
                 .authorizeHttpRequests { it.requestMatchers(HttpMethod.OPTIONS).permitAll() }
                 .authorizeHttpRequests { it.anyRequest().authenticated() }
-                .oauth2ResourceServer { obj: OAuth2ResourceServerConfigurer<HttpSecurity?> -> obj.jwt(Customizer.withDefaults()) }
-                .addFilterAfter(createPolicyEnforcerFilter(), BearerTokenAuthenticationFilter::class.java)
+                .oauth2ResourceServer { it.jwt(Customizer.withDefaults()) }
         return http.build()
-    }
-
-    @Bean
-    open fun jwtDecoder(): JwtDecoder {
-        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build()
-    }
-
-    private fun createPolicyEnforcerFilter(): SpringPolicyEnforcerFilter {
-        return SpringPolicyEnforcerFilter(object : ConfigurationResolver {
-            override fun resolve(request: HttpRequest): PolicyEnforcerConfig {
-                return try {
-                    val policyEnforcerConfig = JsonSerialization.readValue(
-                            javaClass.getResourceAsStream("/policy-enforcer.json"), PolicyEnforcerConfig::class.java
-                    )
-                    policyEnforcerConfig.credentials = mapOf(Pair("secret", clientSecret))
-                    if (request.method == HttpMethod.OPTIONS.name()) {
-                        // always allow options request
-                        policyEnforcerConfig.enforcementMode = EnforcementMode.DISABLED
-                    } else {
-                        policyEnforcerConfig.paths = PATHS
-                    }
-                    policyEnforcerConfig
-                } catch (e: IOException) {
-                    throw RuntimeException(e)
-                }
-            }
-        })
     }
 
     companion object {
@@ -79,17 +40,5 @@ open class WebSecurityConfiguration {
                 "/error",
                 "/timetable/version",
         )
-        private val PATHS = buildPathConfigs()
-
-        private fun buildPathConfigs(): List<PathConfig> {
-            val paths: MutableList<PathConfig> = mutableListOf()
-            for (path in PERMITTED_PATHS) {
-                val pathConfig = PathConfig()
-                pathConfig.path = path.replace("**", "*")
-                pathConfig.enforcementMode = EnforcementMode.DISABLED
-                paths.add(pathConfig)
-            }
-            return paths
-        }
     }
 }

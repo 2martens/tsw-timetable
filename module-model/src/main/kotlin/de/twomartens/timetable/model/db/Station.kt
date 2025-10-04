@@ -18,14 +18,33 @@ data class Station(
         var stationId: StationId,
         var countryCode: CountryCode,
         var name: NonEmptyString,
-        var platforms: List<Platform>
 ) {
     @Id
-    var id: ObjectId = ObjectId()
+    lateinit var id: ObjectId
 
     @CreatedDate
     lateinit var created: Instant
 
     @LastModifiedDate
     lateinit var lastModified: Instant
+
+    private var platformsInternal: MutableMap<String, Platform> = mutableMapOf()
+
+    val platforms: List<Platform> get() = platformsInternal.values.toList()
+
+    fun addPlatform(platform: Platform?) {
+        if (platform == null) {
+            return
+        }
+
+        if (!platformsInternal.containsKey(platform.name)) {
+            platformsInternal[platform.name] = platform
+        } else {
+            platformsInternal[platform.name]?.addAllSections(platform.sections)
+        }
+    }
+
+    fun addAllPlatforms(platforms: Collection<Platform>) {
+        platforms.forEach { addPlatform(it) }
+    }
 }

@@ -7,6 +7,7 @@ import de.twomartens.timetable.model.common.UserId
 import de.twomartens.timetable.model.dto.Timetable
 import de.twomartens.timetable.model.dto.TimetableState
 import de.twomartens.timetable.route.TswRouteRepository
+import de.twomartens.timetable.service.TimetableProcessingScheduler
 import de.twomartens.timetable.types.NonEmptyString
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -32,7 +33,8 @@ class TimetableController(
         private val routeRepository: TswRouteRepository,
         private val timetableRepository: TimetableRepository,
         private val userRepository: UserRepository,
-        private val scheduledTaskService: ScheduledTaskService
+        private val scheduledTaskService: ScheduledTaskService,
+        private val timetableProcessingScheduler: TimetableProcessingScheduler
 ) {
 
     private val mapper = Mappers.getMapper(TimetableMapper::class.java)
@@ -131,6 +133,10 @@ class TimetableController(
                             schema = Schema(implementation = Timetable::class)
                     )]
             ), ApiResponse(
+                responseCode = "400",
+                description = "Provided request is invalid",
+                content = [Content(mediaType = "text/plain")]
+            ), ApiResponse(
                     responseCode = "403",
                     description = "Access forbidden for user",
                     content = [Content(mediaType = "text/plain")]
@@ -167,7 +173,19 @@ class TimetableController(
         if (timetable == null) {
             created = true
             timetable = mapper.mapToDB(userIdConverted, body)
-            timetable.timetableState = TimetableState.PROCESSING
+            timetable.timetableState = TimetableState.FETCHING_TIMETABLES
+
+            if (!timetable.fetchDate.isAfter(LocalDate.now(clock))) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Date of timetable must be in the future")
+            }
+            val route = routeRepository.findByUserIdAndName(userIdConverted, NonEmptyString(timetable.routeName))
+                ?: throw ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Route name must belong to existing route"
+                )
+            scheduledTaskService.triggerTimetableFetch(route, timetable.timetableId,
+                    timetable.fetchDate)
+            timetableProcessingScheduler.scheduleTimetableProcessing(timetable)
         } else {
             timetable.name = NonEmptyString(body.name)
         }
@@ -221,39 +239,5 @@ class TimetableController(
         timetableRepository.delete(timetable)
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
-    }
-
-    @Operation(
-            summary = "Task the backend with fetching a timetable for specified route and date",
-            responses = [ApiResponse(
-                    responseCode = "200",
-                    description = "Timetable will be fetched as requested"
-            ), ApiResponse(
-                    responseCode = "400",
-                    description = "Request does not follow specification"
-            )]
-    )
-    @SecurityRequirement(name = "bearer")
-    @SecurityRequirement(name = "oauth2")
-    @PostMapping("/{userId}/{routeName}/fetchTimetable/{date}")
-    fun scheduleFetch(
-            @PathVariable @Parameter(description = "The id of the user",
-                    example = "1",
-                    required = true) userId: UserId,
-            @PathVariable @Parameter(description = "The name of the TSW route.",
-                    example = "CologneAachen",
-                    required = true) routeName: NonEmptyString,
-            @PathVariable @Parameter(
-                    description = "The date to fetch timetable for. Must be in the future.",
-                    example = "2023-09-12",
-                    required = true) date: LocalDate
-    ) {
-        if (!date.isAfter(LocalDate.now(clock))) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Date must be in the future")
-        }
-        val route = routeRepository.findByUserIdAndName(userId, routeName)
-                ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Route name must belong to existing route")
-        scheduledTaskService.triggerTimetableFetch(route, date)
     }
 }

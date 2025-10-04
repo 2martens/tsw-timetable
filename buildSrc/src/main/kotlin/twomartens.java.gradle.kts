@@ -1,7 +1,7 @@
 import org.gradle.accessors.dm.LibrariesForLibs
 
 plugins {
-    jacoco
+    id("jacoco")
     id("io.freefair.lombok")
     id("twomartens.java-base")
     id("twomartens.checkstyle")

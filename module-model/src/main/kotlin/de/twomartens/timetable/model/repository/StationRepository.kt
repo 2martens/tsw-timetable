@@ -14,7 +14,7 @@ interface StationRepository : MongoRepository<Station, ObjectId> {
         "{\$search: { index: \"stations\", returnStoredSource: true, compound: {must: [{phrase: {query: ?0, path: \"countryCode\"}},{autocomplete: {query: ?1,path: \"name\",tokenOrder: \"sequential\"}}]}}}",
         "{\$limit: 10}",
         "{\$lookup: { from: \"station\", localField: \"_id\", foreignField: \"_id\", as: \"document\" }}",
-        "{\$unwind: \"\$document\"}",
+        "{\$unwind: { path: \"\$document\"}}",
         "{\$replaceWith: \"\$document\"}"
     ])
     fun findAllByCountryCodeAndNameContainingIgnoreCase(countryCode: String, name: String): List<Station>

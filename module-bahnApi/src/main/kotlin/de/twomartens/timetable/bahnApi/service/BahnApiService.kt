@@ -6,6 +6,7 @@ import de.twomartens.timetable.bahnApi.model.dto.BahnStations
 import de.twomartens.timetable.bahnApi.model.dto.BahnTimetable
 import de.twomartens.timetable.bahnApi.property.BahnApiProperties
 import de.twomartens.timetable.types.HourAtDay
+import mu.KotlinLogging
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
@@ -35,9 +36,12 @@ class BahnApiService(
         val dateFormatter = DateTimeFormatter.ofPattern("yyMMdd")
         val timeFormatter = DateTimeFormatter.ofPattern("HH")
         val time = LocalTime.of(hourAtDay.hour.value, 0)
+        val day = hourAtDay.date.format(dateFormatter)
+        val hour = time.format(timeFormatter)
+        val uri = "https://apis.deutschebahn.com/db-api-marketplace/apis/timetables/v1/plan/" +
+                "${eva.value}/${day}/${hour}"
         val body = restClient.get()
-                .uri("https://apis.deutschebahn.com/db-api-marketplace/apis/timetables/v1/plan/" +
-                        "${eva}/${hourAtDay.date.format(dateFormatter)}/${time.format(timeFormatter)}")
+                .uri(uri)
                 .headers {
                     it.accept = mutableListOf(MediaType.APPLICATION_XML)
                     it.contentType = MediaType.APPLICATION_XML
@@ -46,6 +50,12 @@ class BahnApiService(
                 }
                 .retrieve()
                 .body(BahnTimetable::class.java)
-        return body!!
+        log.debug { "Response from DB API, station [${eva.value}], date [$day], hour [$hour], requestURI [$uri]" }
+        body!!.eva = eva
+        return body
+    }
+
+    companion object {
+        private val log = KotlinLogging.logger {}
     }
 }
