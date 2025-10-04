@@ -37,7 +37,7 @@ jib {
         jvmFlags = listOf("-XX:+UseContainerSupport",
                 "-XX:MaxRAMPercentage=75.0")
         user = "nobody"
-        format = ImageFormat.OCI
+        format = ImageFormat.Docker
         labels = mapOf("org.opencontainers.image.description" to "Container image of the TSW Timetable backend")
     }
     outputPaths.digest = "${layout.buildDirectory.get().asFile}/jib-image.digest"
